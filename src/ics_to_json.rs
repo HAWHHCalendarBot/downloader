@@ -15,13 +15,6 @@ pub fn parse(ics_bodies: &[String]) -> Result<Vec<EventEntry>, String> {
         all.append(&mut one);
     }
 
-    all.sort_by_cached_key(|o| {
-        DateTime::parse_from_rfc3339(&o.start_time)
-            .expect("starttime is not a valid datetime")
-            .timestamp()
-    });
-    all.dedup_by_key(|o| serde_json::to_string(&o).expect("could not serialize the event to json"));
-
     Ok(all)
 }
 

@@ -1,4 +1,5 @@
 use crate::EventEntry;
+use chrono::DateTime;
 use itertools::Itertools;
 use std::collections::HashMap;
 use std::fs::DirBuilder;
@@ -78,6 +79,13 @@ fn get_grouped(all: &[EventEntry]) -> HashMap<String, Vec<EventEntry>> {
             let element = serde_json::from_str(&json).unwrap();
             existing.push(element);
         }
+    }
+
+    for group in grouped.values_mut() {
+        group.sort_by_cached_key(|o| {
+            DateTime::parse_from_rfc3339(&o.start_time).expect("starttime is not a valid datetime")
+        });
+        group.dedup_by_key(|o| serde_json::to_string(&o).unwrap());
     }
 
     grouped
