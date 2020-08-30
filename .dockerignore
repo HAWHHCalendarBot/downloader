@@ -1,5 +1,7 @@
-/eventfiles
-/target
 .*
-Dockerfile
 *.md
+/target
+Dockerfile
+
+/additionalEventsGithub
+/eventfiles

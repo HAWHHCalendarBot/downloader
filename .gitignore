@@ -1,3 +1,5 @@
-.last-successful-run
-/eventfiles
 /target
+
+.last-successful-run
+/additionalEventsGithub
+/eventfiles

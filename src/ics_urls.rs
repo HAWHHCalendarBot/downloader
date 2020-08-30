@@ -12,9 +12,9 @@ pub fn get_all_ics_urls(client: &reqwest::blocking::Client) -> Result<Vec<String
     let mut result: Vec<String> = Vec::new();
 
     for url in SOURCE_URLS {
-        println!("get ICS urls from {}", url);
+        println!("ICS get urls from {}", url);
         let mut urls = get_ics_urls_from_url(&client, url)?;
-        println!("got {} ICS urls", urls.len());
+        println!("ICS got {} urls", urls.len());
         result.append(&mut urls);
     }
 

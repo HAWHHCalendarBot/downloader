@@ -2,6 +2,7 @@ use crate::event::EventEntry;
 use std::thread::sleep;
 use std::time::Duration;
 
+mod additionals;
 mod event;
 mod files;
 mod http;
@@ -27,14 +28,33 @@ fn main() {
         #[cfg(debug_assertions)]
         break;
 
-        println!("Wait till next download…");
+        println!("Wait till next download…\n\n");
         sleep(SLEEP_DURATION);
     }
 }
 
 fn the_loop(client: &reqwest::blocking::Client) -> Result<(), String> {
+    let mut all_events: Vec<EventEntry> = Vec::new();
+
+    let mut ics_events = part_ics(&client)?;
+    println!("ICS events: {}", ics_events.len());
+    all_events.append(&mut ics_events);
+
+    let mut additional_events = additionals::get()?;
+    println!("Additional events: {}", additional_events.len());
+    all_events.append(&mut additional_events);
+
+    files::save_events_to_files(&all_events);
+
+    println!("download successful");
+    files::confirm_successful_run();
+
+    Ok(())
+}
+
+fn part_ics(client: &reqwest::blocking::Client) -> Result<Vec<EventEntry>, String> {
     let urls = ics_urls::get_all_ics_urls(&client)?;
-    println!("total ICS urls: {}", urls.len());
+    println!("ICS total urls: {}", urls.len());
 
     let mut contents: Vec<String> = Vec::new();
     for url in &urls {
@@ -43,20 +63,14 @@ fn the_loop(client: &reqwest::blocking::Client) -> Result<(), String> {
         contents.push(content);
 
         #[cfg(debug_assertions)]
-        println!("downloaded {:4}/{}", contents.len(), urls.len());
+        if contents.len() % 10 == 0 {
+            println!("ICS file downloaded {:4}/{}", contents.len(), urls.len());
+        }
 
         #[cfg(not(debug_assertions))]
         sleep(WAIT_BETWEEEN_REQUESTS);
     }
-    println!("downloaded ics urls: {}", contents.len());
+    println!("ICS downloaded files: {}", contents.len());
 
-    let all = ics_to_json::parse(&contents)?;
-    println!("ics events: {}", all.len());
-
-    files::save_events_to_files(&all);
-
-    println!("download successful");
-    files::confirm_successful_run();
-
-    Ok(())
+    ics_to_json::parse(&contents)
 }
