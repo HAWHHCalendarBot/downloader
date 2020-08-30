@@ -27,7 +27,9 @@ VOLUME /app/eventfiles
 VOLUME /app/additionalEventsGithub
 WORKDIR /app
 
-RUN apk --no-cache add bash git
+ENV TZ=Europe/Berlin
+
+RUN apk --no-cache add bash git tzdata
 
 COPY --from=builder /home/rust/target/x86_64-unknown-linux-musl/release/downloader /usr/bin/
 
