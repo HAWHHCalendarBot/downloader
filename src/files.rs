@@ -30,6 +30,7 @@ pub fn save_events_to_files(all: &[EventEntry]) {
     let mut removed_events: Vec<String> = Vec::new();
 
     let grouped = get_grouped(&all);
+    println!("Events by name: {}", grouped.len());
     for key in grouped.keys() {
         let events = grouped.get(key).unwrap();
         let has_changed = save_events_to_file(key, events);
