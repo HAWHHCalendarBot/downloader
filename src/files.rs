@@ -42,6 +42,8 @@ pub fn save_events_to_files(all: &[EventEntry]) {
         expected_files.push(key.replace("/", "-"));
     }
 
+    all_events.sort();
+
     let all_txt_content = all_events.join("\n") + "\n";
     write_only_changed("all.txt", &all_txt_content).expect("failed to write all.txt");
 
