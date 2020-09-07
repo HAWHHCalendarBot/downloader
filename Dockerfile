@@ -2,6 +2,11 @@ FROM ekidd/rust-musl-builder as builder
 
 WORKDIR /home/rust
 
+# For the test
+ENV TZ=Europe/Berlin
+RUN sudo ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ | sudo tee /etc/timezone
+RUN sudo apt-get update && sudo apt-get install -f tzdata
+
 # cargo needs a dummy src/main.rs to detect bin mode
 RUN mkdir -p src && echo "fn main() {}" > src/main.rs
 
