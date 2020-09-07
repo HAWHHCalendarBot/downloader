@@ -114,3 +114,17 @@ fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> Result<String, S
     let date_time: DateTime<Local> = Local.from_local_datetime(&naive).unwrap();
     Ok(date_time.to_rfc3339())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn can_parse_datetime() -> Result<(), String> {
+        assert_eq!(
+            "2020-12-04T22:04:00+01:00",
+            parse_datetime(2020, 12, 04, "22:04")?
+        );
+        Ok(())
+    }
+}

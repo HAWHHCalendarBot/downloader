@@ -55,6 +55,8 @@ jobs:
 
       - name: Run tests
         run: cargo test --verbose --all-targets
+        env:
+          TZ: Europe/Berlin
 
   release:
     name: Release ${{ matrix.config.triple }}
