@@ -14,14 +14,13 @@ const SLEEP_DURATION: Duration = Duration::from_secs(100 * 60); // 100 minutes
 const WAIT_BETWEEEN_REQUESTS: Duration = Duration::from_millis(200); // 200 milliseconds
 
 fn main() {
-    let client = http::init_client().expect("Failed to init http client");
     files::ensure_folders_exist().expect("failed to create folders");
 
     #[allow(clippy::never_loop)]
     #[allow(unreachable_code)]
     loop {
         println!("Its time for another download… Start!");
-        if let Err(err) = the_loop(&client) {
+        if let Err(err) = the_loop() {
             println!("download failed… {}", err)
         }
 
@@ -33,10 +32,10 @@ fn main() {
     }
 }
 
-fn the_loop(client: &reqwest::blocking::Client) -> Result<(), String> {
+fn the_loop() -> Result<(), String> {
     let mut all_events: Vec<EventEntry> = Vec::new();
 
-    let mut ics_events = part_ics(&client)?;
+    let mut ics_events = part_ics()?;
     println!("ICS events: {}", ics_events.len());
     all_events.append(&mut ics_events);
 
@@ -52,13 +51,14 @@ fn the_loop(client: &reqwest::blocking::Client) -> Result<(), String> {
     Ok(())
 }
 
-fn part_ics(client: &reqwest::blocking::Client) -> Result<Vec<EventEntry>, String> {
+fn part_ics() -> Result<Vec<EventEntry>, String> {
+    let client = http::init_client().expect("Failed to init http client");
     let urls = ics_urls::get_all_ics_urls(&client)?;
     println!("ICS total urls: {}", urls.len());
 
     let mut contents: Vec<String> = Vec::new();
     for url in &urls {
-        let content = http::get_haw_text(client, &url)
+        let content = http::get_haw_text(&client, &url)
             .map_err(|err| format!("failed to load url {} {}", url, err))?;
         contents.push(content);
 
