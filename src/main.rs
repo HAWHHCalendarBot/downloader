@@ -63,7 +63,7 @@ fn part_ics(client: &reqwest::blocking::Client) -> Result<Vec<EventEntry>, Strin
         contents.push(content);
 
         #[cfg(debug_assertions)]
-        if contents.len() % 10 == 0 {
+        if contents.len() % 25 == 0 {
             println!("ICS file downloaded {:4}/{}", contents.len(), urls.len());
         }
 
