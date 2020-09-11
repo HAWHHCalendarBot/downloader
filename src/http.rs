@@ -25,16 +25,13 @@ pub fn init_client() -> Result<Client, Error> {
     Client::builder().default_headers(headers).build()
 }
 
-#[allow(dead_code)]
-pub fn get_text(client: &Client, url: &str) -> Result<String, Error> {
-    client.get(url).send()?.text()
-}
-
 pub fn get_haw_text(client: &Client, url: &str) -> Result<String, String> {
     let response = client
         .get(url)
         .send()
         .map_err(|err| format!("failed to get {} {}", url, err))?;
+
+    // Normally you would use response.text() but the haw had to use some non UTF8 encoding…
 
     let bytes = response
         .bytes()
