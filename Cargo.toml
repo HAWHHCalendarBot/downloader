@@ -8,6 +8,7 @@ edition = "2018"
 
 [dependencies]
 chrono = "0.4"
+chrono-tz = "0.5"
 encoding = "0.2"
 itertools = "0.9"
 regex = "1.3"

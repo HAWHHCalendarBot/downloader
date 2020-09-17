@@ -1,5 +1,6 @@
 use crate::event::EventEntry;
-use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
+use chrono::{NaiveDateTime, TimeZone};
+use chrono_tz::Europe::Berlin;
 use regex::Regex;
 
 const EVENT_REGEX: &str = r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#;
@@ -49,7 +50,7 @@ fn parse_datetime(raw: &str) -> Result<String, String> {
     let tless = raw.replace('T', " ");
     let naive = NaiveDateTime::parse_from_str(&tless, "%Y%m%d %H%M%S")
         .map_err(|err| format!("parse_datetime failed {} {}", raw, err))?;
-    let date_time: DateTime<Local> = Local.from_local_datetime(&naive).unwrap();
+    let date_time = Berlin.from_local_datetime(&naive).unwrap();
     // let nanos = date_time.timestamp_millis();
     // let offset = date_time.offset().to_string().replace(":", "");
     // let result = format!("/Date({}{})/", nanos, offset);

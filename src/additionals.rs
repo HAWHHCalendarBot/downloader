@@ -1,5 +1,6 @@
 use crate::event::EventEntry;
-use chrono::{DateTime, Local, NaiveDateTime, TimeZone};
+use chrono::{NaiveDateTime, TimeZone};
+use chrono_tz::Europe::Berlin;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::Command;
@@ -111,7 +112,7 @@ fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> Result<String, S
     let string = format!("{} {} {} {}", year, month, day, time);
     let naive = NaiveDateTime::parse_from_str(&string, "%Y %m %d %H:%M")
         .map_err(|err| format!("parse_datetime failed {} {}", string, err))?;
-    let date_time: DateTime<Local> = Local.from_local_datetime(&naive).unwrap();
+    let date_time = Berlin.from_local_datetime(&naive).unwrap();
     Ok(date_time.to_rfc3339())
 }
 
