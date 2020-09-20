@@ -49,17 +49,18 @@ fn the_loop() -> Result<(), String> {
 fn part_ics() -> Result<Vec<EventEntry>, String> {
     let client = http::init_client().expect("Failed to init http client");
     let urls = ics_urls::get_all_ics_urls(&client)?;
-    println!("ICS total urls: {}", urls.len());
+    let url_amount = urls.len();
+    println!("ICS total urls: {}", url_amount);
 
     let mut contents: Vec<String> = Vec::new();
-    for url in &urls {
+    for url in urls {
         let content = http::get_haw_text(&client, &url)
             .map_err(|err| format!("failed to load url {} {}", url, err))?;
         contents.push(content);
 
         #[cfg(debug_assertions)]
         if contents.len() % 25 == 0 {
-            println!("ICS file downloaded {:4}/{}", contents.len(), urls.len());
+            println!("ICS file downloaded {:4}/{}", contents.len(), url_amount);
         }
 
         #[cfg(not(debug_assertions))]
