@@ -49,7 +49,7 @@ fn get_ics_urls_from_body(base_url: &str, body: &str) -> Result<Vec<String>, url
     let this_document = Url::parse(base_url)?;
 
     let re = Regex::new(ICS_REGEX).expect("Could not create ics regex");
-    for cap in re.captures_iter(&body) {
+    for cap in re.captures_iter(body) {
         let full_url = this_document.join(&cap[1])?;
         result.push(full_url.into_string());
     }

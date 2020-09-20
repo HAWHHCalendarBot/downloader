@@ -38,8 +38,8 @@ fn parse_one(
             name: cap[1].trim().to_owned(),
             location: parse_location(&location_regex, &cap[2].trim()),
             description: description.to_owned(),
-            start_time: parse_datetime(&cap[5].trim())?,
-            end_time: parse_datetime(&cap[6].trim())?,
+            start_time: parse_datetime(cap[5].trim())?,
+            end_time: parse_datetime(cap[6].trim())?,
         });
     }
 
