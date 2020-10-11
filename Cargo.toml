@@ -1,6 +1,6 @@
 [package]
 name = "downloader"
-version = "2.1.2"
+version = "2.1.3"
 authors = ["EdJoPaTo <git-commit-with-a-funny-long-email-address-everyone-hates-as-it-is-too-long@edjopato.de>"]
 edition = "2018"
 
