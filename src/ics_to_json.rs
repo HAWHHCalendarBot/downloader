@@ -4,7 +4,7 @@ use chrono_tz::Europe::Berlin;
 use regex::Regex;
 
 const EVENT_REGEX: &str = r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#;
-const LOCATION_REGEX: &str = r#"  Stand.+"#;
+const LOCATION_REGEX: &str = r#"Stand \d{2}-\d{2}-\d{4}"#;
 
 pub fn parse(ics_bodies: &[String]) -> Result<Vec<EventEntry>, String> {
     let mut all: Vec<EventEntry> = Vec::new();
@@ -66,7 +66,7 @@ fn parse_description(dozent: &str) -> String {
 }
 
 fn parse_location(location_regex: &Regex, raw: &str) -> String {
-    location_regex.replace_all(raw, "").to_string()
+    location_regex.replace_all(raw, "").trim().to_string()
 }
 
 #[cfg(test)]
@@ -102,6 +102,12 @@ mod tests {
         assert_eq!(
             "Stiftstr69 R304a",
             parse_location(&regex, "Stiftstr69 R304a  Stand 12-03-2020")
-        )
+        );
+    }
+
+    #[test]
+    fn location_being_only_stand_ends_up_empty() {
+        let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
+        assert_eq!("", parse_location(&regex, "Stand 12-03-2020"));
     }
 }
