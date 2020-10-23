@@ -69,45 +69,40 @@ fn parse_location(location_regex: &Regex, raw: &str) -> String {
     location_regex.replace_all(raw, "").trim().to_string()
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[test]
+fn can_parse_ics_datetime() -> Result<(), String> {
+    assert_eq!(
+        "2020-12-05T22:04:00+01:00",
+        parse_datetime("20201205T220400")?
+    );
+    assert_eq!(
+        "2020-07-05T12:04:00+02:00",
+        parse_datetime("20200705T120400")?
+    );
+    Ok(())
+}
 
-    #[test]
-    fn can_parse_ics_datetime() -> Result<(), String> {
-        assert_eq!(
-            "2020-12-05T22:04:00+01:00",
-            parse_datetime("20201205T220400")?
-        );
-        assert_eq!(
-            "2020-07-05T12:04:00+02:00",
-            parse_datetime("20200705T120400")?
-        );
-        Ok(())
-    }
+#[test]
+fn empty_dozent_ends_up_as_empty_description() {
+    assert_eq!("", parse_description(""));
+}
 
-    #[test]
-    fn empty_dozent_ends_up_as_empty_description() {
-        assert_eq!("", parse_description(""));
-    }
+#[test]
+fn some_dozent_ends_up_as_description() {
+    assert_eq!("Dozent: HTM", parse_description("HTM"));
+}
 
-    #[test]
-    fn some_dozent_ends_up_as_description() {
-        assert_eq!("Dozent: HTM", parse_description("HTM"));
-    }
+#[test]
+fn location_gets_stand_removed() {
+    let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
+    assert_eq!(
+        "Stiftstr69 R304a",
+        parse_location(&regex, "Stiftstr69 R304a  Stand 12-03-2020")
+    );
+}
 
-    #[test]
-    fn location_gets_stand_removed() {
-        let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
-        assert_eq!(
-            "Stiftstr69 R304a",
-            parse_location(&regex, "Stiftstr69 R304a  Stand 12-03-2020")
-        );
-    }
-
-    #[test]
-    fn location_being_only_stand_ends_up_empty() {
-        let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
-        assert_eq!("", parse_location(&regex, "Stand 12-03-2020"));
-    }
+#[test]
+fn location_being_only_stand_ends_up_empty() {
+    let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
+    assert_eq!("", parse_location(&regex, "Stand 12-03-2020"));
 }
