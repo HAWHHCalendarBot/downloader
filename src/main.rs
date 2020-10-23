@@ -39,7 +39,7 @@ fn the_loop() -> Result<(), String> {
     println!("Additional events: {}", additional_events.len());
     all_events.append(&mut additional_events);
 
-    files::save_events_to_files(&all_events);
+    files::save_events(&all_events);
 
     println!("download successful");
     files::confirm_successful_run();
@@ -49,7 +49,7 @@ fn the_loop() -> Result<(), String> {
 
 fn part_ics() -> Result<Vec<EventEntry>, String> {
     let client = http::init_client().expect("Failed to init http client");
-    let urls = ics_urls::get_all_ics_urls(&client)?;
+    let urls = ics_urls::get_all(&client)?;
     let url_amount = urls.len();
     println!("ICS total urls: {}", url_amount);
 

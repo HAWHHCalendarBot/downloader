@@ -23,7 +23,7 @@ pub fn confirm_successful_run() {
     fs::write(".last-successful-run", "").expect("failed to write last-successful-run");
 }
 
-pub fn save_events_to_files(all: &[EventEntry]) {
+pub fn save_events(all: &[EventEntry]) {
     let mut all_events: Vec<String> = Vec::new();
     let mut expected_files: Vec<String> = Vec::new();
     let mut changed_events: Vec<String> = Vec::new();
