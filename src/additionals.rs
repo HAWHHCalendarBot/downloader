@@ -125,7 +125,7 @@ mod tests {
     fn can_parse_datetime() -> Result<(), String> {
         assert_eq!(
             "2020-12-04T22:04:00+01:00",
-            parse_datetime(2020, 12, 04, "22:04")?
+            parse_datetime(2020, 12, 4, "22:04")?
         );
         Ok(())
     }
