@@ -19,6 +19,7 @@ pub struct AdditionalEvent {
 
 const FOLDER_GIT: &str = "additionalEventsGithub";
 
+#[allow(clippy::non_ascii_literal)]
 const DESCRIPTION: &str = "Dies ist eine zusätzliche, inoffizielle Veranstaltung: https://github.com/HAWHHCalendarBot/AdditionalEvents";
 
 pub fn get() -> Result<Vec<EventEntry>, String> {
