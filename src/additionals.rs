@@ -39,13 +39,14 @@ pub fn get() -> Result<Vec<EventEntry>, String> {
 }
 
 fn pull() -> Result<(), String> {
-    let status = match Path::new("additionalEventsGithub/.git").exists() {
-        true => Command::new("git")
+    let status = if Path::new("additionalEventsGithub/.git").exists() {
+        Command::new("git")
             .arg("pull")
             .current_dir("additionalEventsGithub")
             .status()
-            .map_err(|err| format!("failed to pull additional event repo {}", err))?,
-        false => Command::new("git")
+            .map_err(|err| format!("failed to pull additional event repo {}", err))?
+    } else {
+        Command::new("git")
             .args(&[
                 "clone",
                 "-q",
@@ -55,7 +56,7 @@ fn pull() -> Result<(), String> {
                 "additionalEventsGithub",
             ])
             .status()
-            .map_err(|err| format!("failed to clone additional event repo {}", err))?,
+            .map_err(|err| format!("failed to clone additional event repo {}", err))?
     };
 
     if status.success() {
