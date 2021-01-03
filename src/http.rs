@@ -31,7 +31,7 @@ pub fn get_haw_text(client: &Client, url: &str) -> Result<String, String> {
         .send()
         .map_err(|err| format!("failed to get {} {}", url, err))?;
 
-    // Normally you would use response.text() but the haw had to use some non UTF8 encoding…
+    // Normally you would use response.text() but the haw had to use some non UTF8 encoding...
 
     let bytes = response
         .bytes()

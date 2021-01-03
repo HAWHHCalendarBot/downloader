@@ -16,14 +16,13 @@ const WAIT_BETWEEEN_REQUESTS: Duration = Duration::from_millis(200); // 200 mill
 fn main() {
     files::ensure_folders_exist().expect("failed to create folders");
 
-    #[allow(clippy::non_ascii_literal)]
     loop {
-        println!("Its time for another download… Start!");
+        println!("Its time for another download... Start!");
         if let Err(err) = the_loop() {
-            println!("download failed… {}", err)
+            println!("download failed... {}", err)
         }
 
-        println!("Wait till next download…\n\n");
+        println!("Wait till next download...\n\n");
         sleep(SLEEP_DURATION);
     }
 }
