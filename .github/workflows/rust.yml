@@ -76,14 +76,10 @@ jobs:
           rustc --version
           cargo --version
 
-      - name: Prepare Windows
-        if: runner.os == 'Windows'
-        run: choco install --no-progress llvm
-
       - name: install cross-compile armv7
         if: matrix.config.triple == 'armv7-unknown-linux-gnueabihf'
         run: |
-          sudo apt-get install -y g++-arm-linux-gnueabihf llvm
+          sudo apt-get install -y g++-arm-linux-gnueabihf
           mkdir -p ~/.cargo
           echo '[target.${{ matrix.config.triple }}]' > ~/.cargo/config
           echo 'linker = "arm-linux-gnueabihf-g++"' >> ~/.cargo/config
@@ -91,7 +87,7 @@ jobs:
       - name: install cross-compile arm64
         if: matrix.config.triple == 'aarch64-unknown-linux-gnu'
         run: |
-          sudo apt-get install -y g++-aarch64-linux-gnu llvm
+          sudo apt-get install -y g++-aarch64-linux-gnu
           mkdir -p ~/.cargo
           echo '[target.${{ matrix.config.triple }}]' > ~/.cargo/config
           echo 'linker = "aarch64-linux-gnu-g++"' >> ~/.cargo/config
@@ -113,42 +109,41 @@ jobs:
       - name: Build release
         run: cargo build --release --verbose --locked --all-targets --target ${{ matrix.config.triple }}
 
-      - name: Pack release zip (linux, mac)
-        if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: |
-          rm -f *.zip
-          cd target/${{ matrix.config.triple }}/release
-          zip -r ../../../downloader-${{ matrix.config.triple }}.zip downloader
-      - name: Pack release zip (windows)
-        if: runner.os == 'Windows'
-        run: |
-          del *.zip
-          Compress-Archive -CompressionLevel Optimal -Force -Path target/${{ matrix.config.triple }}/release/downloader.exe -DestinationPath downloader-${{ matrix.config.triple }}.zip
-
       - name: inspect target dir
         if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: |
-          ls -al target
-          ls -al target/*
+        run: ls -al target/*/release
 
-      - name: Publish Artifact (linux, mac)
+      - name: Upload Artifact (linux, mac)
         if: runner.os == 'Linux' || runner.os == 'macOS'
         uses: actions/upload-artifact@v2
         with:
           name: downloader-${{ matrix.config.triple }}
           path: target/${{ matrix.config.triple }}/release/downloader
-      - name: Publish Artifact (windows)
+      - name: Upload Artifact (windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v2
         with:
           name: downloader-${{ matrix.config.triple }}
           path: target/${{ matrix.config.triple }}/release/downloader.exe
 
+      - name: Pack release (linux, mac)
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        run: |
+          rm -f *.tar.gz
+          tar -czf downloader-${{ matrix.config.triple }}.tar.gz -C target/${{ matrix.config.triple }}/release downloader
+      - name: Pack release (windows)
+        if: runner.os == 'Windows'
+        run: |
+          del *.zip
+          Compress-Archive -CompressionLevel Optimal -Force -Path target/${{ matrix.config.triple }}/release/downloader.exe -DestinationPath downloader-${{ matrix.config.triple }}.zip
+
       - name: GH Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v0.1.5
         with:
           draft: true
-          files: '*.zip'
+          files: |
+            *.zip
+            *.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
