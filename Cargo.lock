@@ -76,7 +76,7 @@ checksum = "7477065d45a8fe57167bf3cf8bcd3729b54cfcb81cca49bda2d038ea89ae82ca"
 
 [[package]]
 name = "downloader"
-version = "2.1.4"
+version = "2.1.5"
 dependencies = [
  "chrono",
  "chrono-tz",
