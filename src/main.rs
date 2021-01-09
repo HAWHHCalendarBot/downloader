@@ -48,14 +48,14 @@ fn the_loop() -> Result<(), String> {
 }
 
 fn part_ics() -> Result<Vec<EventEntry>, String> {
-    let client = http::init_client().expect("Failed to init http client");
-    let urls = ics_urls::get_all(&client)?;
+    let agent = ureq::AgentBuilder::new().build();
+    let urls = ics_urls::get_all(&agent)?;
     let url_amount = urls.len();
     println!("ICS total urls: {}", url_amount);
 
     let mut contents: Vec<String> = Vec::new();
     for url in urls {
-        let content = http::get_haw_text(&client, &url)
+        let content = http::get_haw_text(&agent, &url)
             .map_err(|err| format!("failed to load url {} {}", url, err))?;
         contents.push(content);
 

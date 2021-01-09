@@ -1,41 +1,33 @@
+use std::io::Read;
+
 use encoding::all::ISO_8859_1;
 use encoding::{DecoderTrap, Encoding};
-use reqwest::blocking::Client;
-use reqwest::{header, Error};
+use ureq::{Agent, Request};
 
-/// Create a http client
-///
-/// # Example
-///
-/// ```
-/// let client = init_client()?;
-/// let response = client.get(url).send()?;
-/// let body = response.text()?;
-/// ```
-pub fn init_client() -> Result<Client, Error> {
-    let mut headers = header::HeaderMap::new();
-    headers.insert(
-        header::USER_AGENT,
-        header::HeaderValue::from_static("github.com/HAWHHCalendarBot/downloader"),
-    );
-    headers.insert(
-        header::FROM,
-        header::HeaderValue::from_static("calendarbot@hawhh.de"),
-    );
-    Client::builder().default_headers(headers).build()
+fn get_with_headers(agent: &Agent, url: &str) -> Request {
+    agent
+        .get(url)
+        .set("user-agent", "github.com/HAWHHCalendarBot/downloader")
+        .set("from", "calendarbot@hawhh.de")
 }
 
-pub fn get_haw_text(client: &Client, url: &str) -> Result<String, String> {
-    let response = client
-        .get(url)
-        .send()
-        .map_err(|err| format!("failed to get {} {}", url, err))?;
+pub fn get_text(agent: &Agent, url: &str) -> Result<String, String> {
+    get_with_headers(agent, url)
+        .call()
+        .map_err(|err| format!("failed to get {} {}", url, err))?
+        .into_string()
+        .map_err(|err| format!("failed to read string {} {}", url, err))
+}
 
-    // Normally you would use response.text() but the haw had to use some non UTF8 encoding...
+pub fn get_haw_text(agent: &Agent, url: &str) -> Result<String, String> {
+    let mut bytes: Vec<u8> = vec![];
 
-    let bytes = response
-        .bytes()
-        .map_err(|err| format!("failed to get bytes from response {} {}", url, err))?;
+    get_with_headers(agent, url)
+        .call()
+        .map_err(|err| format!("failed to get {} {}", url, err))?
+        .into_reader()
+        .read_to_end(&mut bytes)
+        .map_err(|err| format!("failed to read bytes {} {}", url, err))?;
 
     ISO_8859_1
         .decode(&bytes, DecoderTrap::Replace)

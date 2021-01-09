@@ -1,5 +1,8 @@
 use regex::Regex;
+use ureq::Agent;
 use url::Url;
+
+use crate::http::get_text;
 
 const ICS_REGEX: &str = r#"href="(\S+\.ics)""#;
 
@@ -8,11 +11,11 @@ static SOURCE_URLS: &[&str] = &[
     "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/"
 ];
 
-pub fn get_all(client: &reqwest::blocking::Client) -> Result<Vec<String>, String> {
+pub fn get_all(agent: &Agent) -> Result<Vec<String>, String> {
     let mut result: Vec<String> = Vec::new();
 
     for url in SOURCE_URLS {
-        let mut urls = get_from_url(&client, url)
+        let mut urls = get_from_url(&agent, url)
             .map_err(|err| format!("failed to get ics urls from {} {}", url, err))?;
         result.append(&mut urls);
     }
@@ -20,15 +23,8 @@ pub fn get_all(client: &reqwest::blocking::Client) -> Result<Vec<String>, String
     Ok(result)
 }
 
-fn get_from_url(client: &reqwest::blocking::Client, base_url: &str) -> Result<Vec<String>, String> {
-    let response = client
-        .get(base_url)
-        .send()
-        .map_err(|err| format!("HTTP reqwest failed {}", err))?;
-
-    let body = response
-        .text()
-        .map_err(|err| format!("reading text from reqwest failed {}", err))?;
+fn get_from_url(agent: &Agent, base_url: &str) -> Result<Vec<String>, String> {
+    let body = get_text(agent, base_url)?;
 
     let urls =
         get_from_body(base_url, &body).map_err(|err| format!("parsing urls failed {}", err))?;
