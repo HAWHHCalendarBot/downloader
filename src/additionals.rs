@@ -1,10 +1,12 @@
-use crate::event::EventEntry;
-use chrono::{NaiveDateTime, TimeZone};
-use chrono_tz::Europe::Berlin;
-use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::Command;
 use std::{fs, io};
+
+use chrono::{NaiveDateTime, TimeZone};
+use chrono_tz::Europe::Berlin;
+use serde::{Deserialize, Serialize};
+
+use crate::event::EventEntry;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AdditionalEvent {

@@ -1,10 +1,12 @@
-use crate::EventEntry;
-use chrono::DateTime;
-use itertools::Itertools;
 use std::collections::HashMap;
 use std::fs::DirBuilder;
 use std::path::Path;
 use std::{fs, io};
+
+use chrono::DateTime;
+use itertools::Itertools;
+
+use crate::EventEntry;
 
 #[derive(PartialEq)]
 enum HasChanged {

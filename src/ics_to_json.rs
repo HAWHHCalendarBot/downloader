@@ -1,7 +1,8 @@
-use crate::event::EventEntry;
 use chrono::{NaiveDateTime, TimeZone};
 use chrono_tz::Europe::Berlin;
 use regex::Regex;
+
+use crate::event::EventEntry;
 
 const EVENT_REGEX: &str = r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#;
 const LOCATION_REGEX: &str = r#"Stand \d{2}-\d{2}-\d{4}"#;
