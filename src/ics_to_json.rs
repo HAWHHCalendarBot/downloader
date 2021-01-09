@@ -7,17 +7,22 @@ use crate::event::EventEntry;
 const EVENT_REGEX: &str = r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#;
 const LOCATION_REGEX: &str = r#"Stand \d{2}-\d{2}-\d{4}"#;
 
-pub fn parse(ics_bodies: &[String]) -> Result<Vec<EventEntry>, String> {
-    let mut all: Vec<EventEntry> = Vec::new();
-    let event_regex = Regex::new(EVENT_REGEX).expect("Could not create ics regex");
-    let location_regex = Regex::new(LOCATION_REGEX).expect("Could not create location regex");
+pub struct IcsToJson {
+    event_regex: Regex,
+    location_regex: Regex,
+}
 
-    for body in ics_bodies {
-        let mut one = parse_one(&event_regex, &location_regex, &body)?;
-        all.append(&mut one);
+impl IcsToJson {
+    pub fn new() -> Self {
+        Self {
+            event_regex: Regex::new(EVENT_REGEX).expect("Could not create ics regex"),
+            location_regex: Regex::new(LOCATION_REGEX).expect("Could not create location regex"),
+        }
     }
 
-    Ok(all)
+    pub fn parse(&self, ics_body: &str) -> Result<Vec<EventEntry>, String> {
+        parse_one(&self.event_regex, &self.location_regex, ics_body)
+    }
 }
 
 fn parse_one(

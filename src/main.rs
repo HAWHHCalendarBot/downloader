@@ -49,25 +49,32 @@ fn the_loop() -> Result<(), String> {
 
 fn part_ics() -> Result<Vec<EventEntry>, String> {
     let agent = ureq::AgentBuilder::new().build();
+    let parser = ics_to_json::IcsToJson::new();
+
     let urls = ics_urls::get_all(&agent)?;
     let url_amount = urls.len();
     println!("ICS total urls: {}", url_amount);
 
-    let mut contents: Vec<String> = Vec::new();
+    let mut entries = Vec::new();
+    let mut current: usize = 0;
     for url in urls {
         let content = http::get_haw_text(&agent, &url)
             .map_err(|err| format!("failed to load url {} {}", url, err))?;
-        contents.push(content);
+
+        let mut one = parser.parse(&content)?;
+        entries.append(&mut one);
+
+        current += 1;
 
         #[cfg(debug_assertions)]
-        if contents.len() % 25 == 0 {
-            println!("ICS file downloaded {:4}/{}", contents.len(), url_amount);
+        if current % 25 == 0 {
+            println!("ICS file downloaded {:4}/{}", current, url_amount);
         }
 
         #[cfg(not(debug_assertions))]
         sleep(WAIT_BETWEEEN_REQUESTS);
     }
-    println!("ICS downloaded files: {}", contents.len());
+    println!("ICS downloaded files: {}", current);
 
-    ics_to_json::parse(&contents)
+    Ok(entries)
 }
