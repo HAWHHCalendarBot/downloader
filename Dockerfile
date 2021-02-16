@@ -1,4 +1,4 @@
-FROM ekidd/rust-musl-builder as builder
+FROM docker.io/ekidd/rust-musl-builder as builder
 
 WORKDIR /home/rust
 
@@ -22,7 +22,7 @@ RUN strip target/x86_64-unknown-linux-musl/release/downloader
 
 
 # Start building the final image
-FROM alpine
+FROM docker.io/library/alpine
 VOLUME /app/eventfiles
 VOLUME /app/additionalEventsGithub
 WORKDIR /app
