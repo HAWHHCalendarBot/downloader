@@ -6,7 +6,6 @@ WORKDIR /home/rust
 RUN mkdir -p src && echo "fn main() {}" > src/main.rs
 
 COPY Cargo.toml Cargo.lock ./
-RUN cargo test
 RUN cargo build --release
 
 # We need to touch our real main.rs file or else docker will use
@@ -14,7 +13,6 @@ RUN cargo build --release
 COPY . ./
 RUN sudo touch src/main.rs
 
-RUN cargo test
 RUN cargo build --release
 
 # Size optimization
