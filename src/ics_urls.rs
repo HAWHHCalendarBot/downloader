@@ -30,10 +30,10 @@ fn get_from_url(agent: &Agent, base_url: &str) -> Result<Vec<String>, String> {
         get_from_body(base_url, &body).map_err(|err| format!("parsing urls failed {}", err))?;
 
     if urls.is_empty() {
-        Err("no ics urls found".to_owned())
-    } else {
-        Ok(urls)
+        println!("WARNING: no ics urls from url {}", base_url);
     }
+
+    Ok(urls)
 }
 
 fn get_from_body(base_url: &str, body: &str) -> Result<Vec<String>, url::ParseError> {
