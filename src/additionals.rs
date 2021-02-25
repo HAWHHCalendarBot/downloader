@@ -44,6 +44,7 @@ fn pull() -> Result<(), String> {
     let status = if Path::new("additionalEventsGithub/.git").exists() {
         Command::new("git")
             .arg("pull")
+            .arg("--ff-only")
             .current_dir("additionalEventsGithub")
             .status()
             .map_err(|err| format!("failed to pull additional event repo {}", err))?
