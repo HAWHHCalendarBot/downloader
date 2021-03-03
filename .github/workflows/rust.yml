@@ -10,10 +10,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: 'Log versions'
-        run: |
-          rustc --version
-          cargo --version
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          components: clippy
+
       - name: Cache cargo
         uses: actions/cache@v2
         with:
@@ -24,19 +29,48 @@ jobs:
           key: ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Run clippy
-        run: cargo clippy --verbose --all-targets --all-features -- -D warnings -D clippy::pedantic
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --verbose --all-targets --all-features -- -D clippy::all -D clippy::pedantic
+
+  rustfmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          components: rustfmt
+
       - name: Check format
         run: cargo fmt -- --check --verbose
 
   test:
-    name: Test
-    runs-on: ubuntu-latest
+    name: Test ${{ matrix.rust }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: lint
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        rust: [stable, nightly]
     steps:
       - uses: actions/checkout@v2
-      - name: 'Log versions'
-        run: |
-          rustc --version
-          cargo --version
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
+          profile: minimal
+          override: true
+
       - name: Cache cargo
         uses: actions/cache@v2
         with:
@@ -46,29 +80,32 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Build
-        run: cargo build --verbose --locked --all-targets
-
       - name: Run tests
-        run: cargo test --verbose --all-targets
+        run: cargo test --verbose --locked --all-features
 
   release:
     name: Release ${{ matrix.triple }}
     runs-on: ${{ matrix.os }}
+    needs: test
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-latest
             triple: x86_64-unknown-linux-gnu
+            name: downloader-x86_64-unknown-linux-gnu.tar.gz
           - os: ubuntu-latest
             triple: armv7-unknown-linux-gnueabihf
+            name: downloader-armv7-unknown-linux-gnueabihf.tar.gz
           - os: ubuntu-latest
             triple: aarch64-unknown-linux-gnu
+            name: downloader-aarch64-unknown-linux-gnu.tar.gz
           - os: macOS-latest
             triple: x86_64-apple-darwin
+            name: downloader-x86_64-apple-darwin.tar.gz
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
+            name: downloader-x86_64-pc-windows-msvc.zip
 
     steps:
       - uses: actions/checkout@v2
@@ -104,7 +141,7 @@ jobs:
         with:
           command: build
           args: --release --verbose --locked --target ${{ matrix.triple }}
-          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
+          use-cross: ${{ runner.os == 'Linux' }}
 
       - name: Upload Artifact (-nix)
         if: runner.os != 'Windows'
@@ -127,14 +164,14 @@ jobs:
         run: |
           rm -f *.tar.gz
           cd target/${{ matrix.triple }}/release
-          tar -czvf ../../../downloader-${{ matrix.triple }}.tar.gz downloader
+          tar -czvf ../../../${{ matrix.name }} downloader
           cd -
       - name: Pack release (windows)
         if: runner.os == 'Windows'
         run: |
           del *.zip
           cd target/${{ matrix.triple }}/release
-          7z a ../../../downloader-${{ matrix.triple }}.zip downloader.exe
+          7z a ../../../${{ matrix.name }} downloader.exe
           cd -
 
       - name: Inspect root dir
@@ -143,10 +180,8 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: test-downloader-${{ matrix.triple }}
-          path: |
-            *.zip
-            *.tar.gz
+          name: test-${{ matrix.name }}
+          path: ${{ matrix.name }}
 
       - name: GH Release
         if: startsWith(github.ref, 'refs/tags/')
