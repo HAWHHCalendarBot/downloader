@@ -141,7 +141,7 @@ jobs:
         with:
           command: build
           args: --release --verbose --locked --target ${{ matrix.triple }}
-          use-cross: ${{ runner.os == 'Linux' }}
+          use-cross: ${{ runner.os == 'Linux' && matrix.triple != 'x86_64-unknown-linux-gnu' }}
 
       - name: Upload Artifact (-nix)
         if: runner.os != 'Windows'
