@@ -60,8 +60,7 @@ fn part_ics() -> Result<Vec<EventEntry>, String> {
     let mut entries = Vec::new();
     let mut current: usize = 0;
     for url in urls {
-        let content = http::get_haw_text(&agent, &url)
-            .map_err(|err| format!("failed to load url {} {}", url, err))?;
+        let content = http::get_haw_text(&agent, &url)?;
 
         let mut one = parser.parse(&content)?;
         entries.append(&mut one);
