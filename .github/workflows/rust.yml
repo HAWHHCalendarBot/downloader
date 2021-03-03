@@ -79,6 +79,7 @@ jobs:
       - name: install cross-compile armv7
         if: matrix.config.triple == 'armv7-unknown-linux-gnueabihf'
         run: |
+          sudo apt-get update
           sudo apt-get install -y g++-arm-linux-gnueabihf
           mkdir -p ~/.cargo
           echo '[target.${{ matrix.config.triple }}]' > ~/.cargo/config
@@ -87,6 +88,7 @@ jobs:
       - name: install cross-compile arm64
         if: matrix.config.triple == 'aarch64-unknown-linux-gnu'
         run: |
+          sudo apt-get update
           sudo apt-get install -y g++-aarch64-linux-gnu
           mkdir -p ~/.cargo
           echo '[target.${{ matrix.config.triple }}]' > ~/.cargo/config
