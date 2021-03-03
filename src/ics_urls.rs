@@ -6,9 +6,9 @@ use crate::http::get_text;
 
 const ICS_REGEX: &str = r#"href="(\S+\.ics)""#;
 
-static SOURCE_URLS: &[&str] = &[
+const SOURCE_URLS: &[&str] = &[
     "https://userdoc.informatik.haw-hamburg.de/doku.php?id=stundenplan:ics_public",
-    "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/"
+    "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
 ];
 
 pub fn get_all(agent: &Agent) -> Result<Vec<String>, String> {
