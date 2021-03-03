@@ -60,7 +60,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        toolchain: [stable, nightly]
+        toolchain: [stable, beta, nightly]
     steps:
       - uses: actions/checkout@v2
 
