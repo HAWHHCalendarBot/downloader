@@ -94,7 +94,7 @@ jobs:
           toolchain: stable
           override: true
           profile: minimal
-          target: ${{ matrix.target }}
+          target: ${{ matrix.triple }}
 
       - name: Build release
         uses: actions-rs/cargo@v1
@@ -103,7 +103,7 @@ jobs:
            SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
-          args: --release --verbose --locked --target ${{ matrix.target }}
+          args: --release --verbose --locked --target ${{ matrix.triple }}
           use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
       - name: Upload Artifact (-nix)
@@ -126,14 +126,14 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           rm -f *.tar.gz
-          cd target/${{ matrix.target }}/release
+          cd target/${{ matrix.triple }}/release
           tar -czvf ../../../downloader-${{ matrix.triple }}.tar.gz downloader
           cd -
       - name: Pack release (windows)
         if: runner.os == 'Windows'
         run: |
           del *.zip
-          cd target/${{ matrix.target }}/release
+          cd target/${{ matrix.triple }}/release
           7z a ../../../downloader-${{ matrix.triple }}.zip downloader.exe
           cd -
 
