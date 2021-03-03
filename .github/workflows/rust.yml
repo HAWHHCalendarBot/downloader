@@ -45,7 +45,10 @@ jobs:
           components: rustfmt
 
       - name: Check format
-        run: cargo fmt -- --check --verbose
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check --verbose
 
   test:
     name: Test ${{ matrix.os }} ${{ matrix.toolchain }}
@@ -67,7 +70,10 @@ jobs:
           override: true
 
       - name: Run tests
-        run: cargo test --verbose --locked --all-features
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --verbose --locked --all-features
 
   release:
     name: Release ${{ matrix.triple }}
