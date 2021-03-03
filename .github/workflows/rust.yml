@@ -6,7 +6,7 @@ on:
 
 jobs:
   clippy:
-    name: Clippy ${{ matrix.os }}
+    name: Clippy ${{ runner.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -57,7 +57,7 @@ jobs:
         run: cargo fmt -- --check --verbose
 
   test:
-    name: Test ${{ matrix.toolchain }} ${{ matrix.os }}
+    name: Test ${{ matrix.toolchain }} on ${{ runner.os }}
     runs-on: ${{ matrix.os }}
     needs: clippy
     strategy:
