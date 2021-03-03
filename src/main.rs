@@ -58,24 +58,32 @@ fn part_ics() -> Result<Vec<EventEntry>, String> {
     println!("ICS total urls: {}", url_amount);
 
     let mut entries = Vec::new();
+    let mut successful: usize = 0;
+
+    #[cfg(debug_assertions)]
     let mut current: usize = 0;
+
     for url in urls {
-        let content = http::get_haw_text(&agent, &url)?;
-
-        let mut one = parser.parse(&content)?;
-        entries.append(&mut one);
-
-        current += 1;
+        match http::get_haw_text(&agent, &url).and_then(|content| parser.parse(&content)) {
+            Ok(mut one) => {
+                entries.append(&mut one);
+                successful += 1;
+            }
+            Err(err) => println!("WARNING: url will be skipped: {}", err),
+        }
 
         #[cfg(debug_assertions)]
-        if current % 25 == 0 {
-            println!("ICS file downloaded {:4}/{}", current, url_amount);
+        {
+            current += 1;
+            if current % 25 == 0 {
+                println!("ICS file download {:4}/{}", current, url_amount);
+            }
         }
 
         #[cfg(not(debug_assertions))]
         sleep(WAIT_BETWEEEN_REQUESTS);
     }
-    println!("ICS downloaded files: {}", current);
+    println!("ICS downloaded files: {}", successful);
 
     Ok(entries)
 }
