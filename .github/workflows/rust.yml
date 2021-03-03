@@ -23,15 +23,6 @@ jobs:
           profile: minimal
           components: clippy
 
-      - name: Cache cargo
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Run clippy
         uses: actions-rs/cargo@v1
         with:
@@ -75,15 +66,6 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Cache cargo
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-test-${{ matrix.toolchain }}-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Run tests
         run: cargo test --verbose --locked --all-features
 
@@ -111,21 +93,6 @@ jobs:
       BINARY: downloader
     steps:
       - uses: actions/checkout@v2
-
-      - name: Cache cargo registry
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-          key: ${{ runner.os }}-cargo-release-registry-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Cache cargo target
-        uses: actions/cache@v2
-        with:
-          path: |
-            target
-          key: ${{ matrix.triple }}-cargo-release-target-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
