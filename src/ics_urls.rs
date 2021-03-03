@@ -8,6 +8,7 @@ const ICS_REGEX: &str = r#"href="(\S+\.ics)""#;
 
 const SOURCE_URLS: &[&str] = &[
     "https://userdoc.informatik.haw-hamburg.de/doku.php?id=stundenplan:ics_public",
+    "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/",
     "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
 ];
 
