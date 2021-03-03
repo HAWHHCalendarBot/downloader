@@ -48,14 +48,14 @@ jobs:
         run: cargo fmt -- --check --verbose
 
   test:
-    name: Test ${{ matrix.toolchain }} on ${{ matrix.os }}
+    name: Test ${{ matrix.os }} ${{ matrix.toolchain }}
     runs-on: ${{ matrix.os }}
     needs: clippy
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [stable, nightly]
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        toolchain: [stable, nightly]
     steps:
       - uses: actions/checkout@v2
 
