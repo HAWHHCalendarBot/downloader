@@ -95,8 +95,7 @@ jobs:
             triple: x86_64-apple-darwin
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
-    env:
-      BINARY: downloader
+
     steps:
       - uses: actions/checkout@v2
 
@@ -119,13 +118,13 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           cd target/${{ matrix.triple }}/release
-          tar -czvf ../../../$BINARY-${{ matrix.triple }}.tar.gz $BINARY
+          tar -czvf ../../../downloader-${{ matrix.triple }}.tar.gz downloader
           cd -
       - name: Pack release (windows)
         if: runner.os == 'Windows'
         run: |
           cd target/${{ matrix.triple }}/release
-          7z a ../../../$BINARY-${{ matrix.triple }}.zip $BINARY.exe
+          7z a ../../../downloader-${{ matrix.triple }}.zip downloader.exe
           cd -
 
       - name: Upload Artifact
