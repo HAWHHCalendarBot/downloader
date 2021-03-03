@@ -53,11 +53,12 @@ jobs:
         run: cargo test --verbose --all-targets
 
   release:
-    name: Release ${{ matrix.config.triple }}
-    runs-on: ${{ matrix.config.os }}
+    name: Release ${{ matrix.triple }}
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        config:
+        include:
           - os: ubuntu-latest
             triple: x86_64-unknown-linux-gnu
           - os: ubuntu-latest
@@ -71,71 +72,81 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Log versions
-        run: |
-          rustc --version
-          cargo --version
 
-      - name: install cross-compile armv7
-        if: matrix.config.triple == 'armv7-unknown-linux-gnueabihf'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++-arm-linux-gnueabihf
-          mkdir -p ~/.cargo
-          echo '[target.${{ matrix.config.triple }}]' > ~/.cargo/config
-          echo 'linker = "arm-linux-gnueabihf-g++"' >> ~/.cargo/config
-
-      - name: install cross-compile arm64
-        if: matrix.config.triple == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++-aarch64-linux-gnu
-          mkdir -p ~/.cargo
-          echo '[target.${{ matrix.config.triple }}]' > ~/.cargo/config
-          echo 'linker = "aarch64-linux-gnu-g++"' >> ~/.cargo/config
-
-      - name: Add Target
-        run: rustup target add ${{ matrix.config.triple }}
-
-      - name: Cache cargo
+      - name: Cache cargo registry
         uses: actions/cache@v2
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+          key: ${{ runner.os }}-cargo-release-registry-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Cache cargo target
+        uses: actions/cache@v2
+        with:
+          path: |
             target
-          key: ${{ matrix.config.triple }}-cargo-release-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.triple }}-cargo-release-target-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          target: ${{ matrix.target }}
 
       - name: Build release
-        run: cargo build --release --verbose --locked --all-targets --target ${{ matrix.config.triple }}
+        uses: actions-rs/cargo@v1
+        # TODO: Remove this once it's the default
+        env:
+           SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
+        with:
+          command: build
+          args: --release --verbose --locked --target ${{ matrix.target }}
+          use-cross: ${{ matrix.os == 'ubuntu-latest' }}
 
-      - name: inspect target dir
-        if: runner.os == 'Linux' || runner.os == 'macOS'
-        run: ls -al target/*/release
-
-      - name: Upload Artifact (linux, mac)
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+      - name: Upload Artifact (-nix)
+        if: runner.os != 'Windows'
         uses: actions/upload-artifact@v2
         with:
-          name: downloader-${{ matrix.config.triple }}
-          path: target/${{ matrix.config.triple }}/release/downloader
+          name: downloader-${{ matrix.triple }}
+          path: target/${{ matrix.triple }}/release/downloader
       - name: Upload Artifact (windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v2
         with:
-          name: downloader-${{ matrix.config.triple }}
-          path: target/${{ matrix.config.triple }}/release/downloader.exe
+          name: downloader-${{ matrix.triple }}
+          path: target/${{ matrix.triple }}/release/downloader.exe
 
-      - name: Pack release (linux, mac)
-        if: runner.os == 'Linux' || runner.os == 'macOS'
+      - name: Inspect root dir
+        run: ls
+
+      - name: Pack release (-nix)
+        if: runner.os != 'Windows'
         run: |
           rm -f *.tar.gz
-          tar -czf downloader-${{ matrix.config.triple }}.tar.gz -C target/${{ matrix.config.triple }}/release downloader
+          cd target/${{ matrix.target }}/release
+          tar -czvf ../../../downloader-${{ matrix.triple }}.tar.gz downloader
+          cd -
       - name: Pack release (windows)
         if: runner.os == 'Windows'
         run: |
           del *.zip
-          Compress-Archive -CompressionLevel Optimal -Force -Path target/${{ matrix.config.triple }}/release/downloader.exe -DestinationPath downloader-${{ matrix.config.triple }}.zip
+          cd target/${{ matrix.target }}/release
+          7z a ../../../downloader-${{ matrix.triple }}.zip downloader.exe
+          cd -
+
+      - name: Inspect root dir
+        run: ls
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-downloader-${{ matrix.triple }}
+          path: |
+            *.zip
+            *.tar.gz
 
       - name: GH Release
         if: startsWith(github.ref, 'refs/tags/')
