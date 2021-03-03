@@ -159,26 +159,18 @@ jobs:
           name: downloader-${{ matrix.triple }}
           path: target/${{ matrix.triple }}/release/downloader.exe
 
-      - name: Inspect root dir
-        run: ls
-
       - name: Pack release (-nix)
         if: runner.os != 'Windows'
         run: |
-          rm -f *.tar.gz
           cd target/${{ matrix.triple }}/release
           tar -czvf ../../../${{ matrix.name }} downloader
           cd -
       - name: Pack release (windows)
         if: runner.os == 'Windows'
         run: |
-          del *.zip
           cd target/${{ matrix.triple }}/release
           7z a ../../../${{ matrix.name }} downloader.exe
           cd -
-
-      - name: Inspect root dir
-        run: ls
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
