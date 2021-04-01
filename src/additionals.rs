@@ -78,7 +78,8 @@ fn get_filenames() -> Result<Vec<String>, io::Error> {
             .into_string()
             .expect("filename contains something that can not be read easily with rust");
 
-        if filename.ends_with(".json") {
+        #[allow(clippy::case_sensitive_file_extension_comparisons)]
+        if filename.to_lowercase().ends_with(".json") {
             list.push(filename.to_owned());
         }
     }

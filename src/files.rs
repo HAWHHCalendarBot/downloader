@@ -125,7 +125,8 @@ fn read_existing_eventfiles() -> Result<Vec<String>, io::Error> {
             .into_string()
             .expect("filename contains something that can not be read easily with rust");
 
-        if filename.ends_with(".json") {
+        #[allow(clippy::case_sensitive_file_extension_comparisons)]
+        if filename.to_lowercase().ends_with(".json") {
             let len = filename.len();
             let without_extension = &filename[..len - 4 - 1];
             list.push(without_extension.to_owned());
