@@ -37,10 +37,10 @@ pub fn save_events(all: &[EventEntry]) {
         let events = grouped.get(key).unwrap();
         let has_changed = save_events_to_file(key, events);
         if has_changed == HasChanged::Changed {
-            changed_events.push(key.to_owned());
+            changed_events.push(key.clone());
         }
 
-        all_events.push(key.to_owned());
+        all_events.push(key.clone());
         expected_files.push(key.replace("/", "-"));
     }
 
@@ -72,9 +72,9 @@ pub fn save_events(all: &[EventEntry]) {
 fn get_grouped(all: &[EventEntry]) -> HashMap<String, Vec<EventEntry>> {
     let mut grouped: HashMap<String, Vec<EventEntry>> = HashMap::new();
 
-    for (key, group) in &all.iter().group_by(|o| o.name.to_owned()) {
+    for (key, group) in &all.iter().group_by(|o| o.name.clone()) {
         if !grouped.contains_key(&key) {
-            grouped.insert(key.to_owned(), Vec::new());
+            grouped.insert(key.clone(), Vec::new());
         }
 
         let existing = grouped.get_mut(&key).unwrap();

@@ -80,7 +80,7 @@ fn get_filenames() -> Result<Vec<String>, io::Error> {
 
         #[allow(clippy::case_sensitive_file_extension_comparisons)]
         if filename.to_lowercase().ends_with(".json") {
-            list.push(filename.to_owned());
+            list.push(filename);
         }
     }
 
@@ -106,8 +106,8 @@ fn parse_additional_event_to_event_entry(before: &AdditionalEvent) -> Result<Eve
     let start = parse_datetime(before.year, before.month, before.date, &before.starttime)?;
     let end = parse_datetime(before.year, before.month, before.date, &before.endtime)?;
     Ok(EventEntry {
-        name: before.name.to_owned(),
-        location: before.room.to_owned(),
+        name: before.name.clone(),
+        location: before.room.clone(),
         description: DESCRIPTION.to_owned(),
         start_time: start,
         end_time: end,
