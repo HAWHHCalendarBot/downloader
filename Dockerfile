@@ -16,7 +16,7 @@ RUN sudo touch src/main.rs
 RUN cargo build --release
 
 # Size optimization
-RUN strip target/x86_64-unknown-linux-musl/release/downloader
+RUN strip target/x86_64-unknown-linux-musl/release/hawhh-calendarbot-downloader
 
 
 # Start building the final image
@@ -27,9 +27,9 @@ WORKDIR /app
 
 RUN apk --no-cache add bash git
 
-COPY --from=builder /home/rust/target/x86_64-unknown-linux-musl/release/downloader /usr/bin/
+COPY --from=builder /home/rust/target/x86_64-unknown-linux-musl/release/hawhh-calendarbot-downloader /usr/bin/
 
 HEALTHCHECK --interval=5m \
     CMD bash -c '[[ $(find . -maxdepth 1 -name ".last-successful-run" -mmin "-250" -print | wc -l) == "1" ]]'
 
-ENTRYPOINT ["downloader"]
+ENTRYPOINT ["hawhh-calendarbot-downloader"]
