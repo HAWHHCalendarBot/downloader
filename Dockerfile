@@ -25,7 +25,7 @@ VOLUME /app/eventfiles
 VOLUME /app/additionalEventsGithub
 WORKDIR /app
 
-RUN apk --no-cache add bash git
+RUN apk --no-cache upgrade && apk --no-cache add bash git
 
 COPY --from=builder /home/rust/target/x86_64-unknown-linux-musl/release/hawhh-calendarbot-downloader /usr/bin/
 
