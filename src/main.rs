@@ -64,7 +64,7 @@ fn part_ics() -> Result<Vec<EventEntry>, String> {
     let mut current: usize = 0;
 
     for url in urls {
-        match http::get_haw_text(&agent, &url).and_then(|content| parser.parse(&content)) {
+        match http::get_haw_text(&agent, url.as_str()).and_then(|content| parser.parse(&content)) {
             Ok(mut one) => {
                 entries.append(&mut one);
                 successful += 1;
