@@ -1,6 +1,8 @@
-FROM docker.io/library/alpine as builder
+FROM docker.io/library/alpine:edge as builder
 WORKDIR /build
-RUN apk --no-cache upgrade && apk --no-cache add cargo
+RUN apk --no-cache upgrade \
+    && apk --no-cache add cargo \
+    && rustc --version && cargo --version
 
 # cargo needs a dummy src/main.rs to detect bin mode
 RUN mkdir -p src && echo "fn main() {}" > src/main.rs
