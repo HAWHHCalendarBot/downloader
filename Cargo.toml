@@ -2,7 +2,8 @@
 name = "hawhh-calendarbot-downloader"
 version = "3.0.0"
 license = "AGPL-3.0-or-later"
-authors = ["EdJoPaTo <git-commit-with-a-funny-long-email-address-everyone-hates-as-it-is-too-long@edjopato.de>"]
+repository = "https://github.com/HAWHHCalendarBot/downloader"
+authors = ["EdJoPaTo <calendarbot-downloader@edjopato.de>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
