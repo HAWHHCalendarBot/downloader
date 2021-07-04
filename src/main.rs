@@ -22,7 +22,7 @@ fn main() {
     loop {
         println!("Its time for another download... Start!");
         if let Err(err) = the_loop() {
-            println!("download failed... {}", err)
+            println!("download failed... {}", err);
         }
 
         println!("Wait till next download...\n\n");

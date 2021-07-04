@@ -16,7 +16,7 @@ pub fn get_all(agent: &Agent) -> Result<Vec<Url>, String> {
     let mut result: Vec<Url> = Vec::new();
 
     for url in SOURCE_URLS {
-        let mut urls = get_from_url(&agent, url)
+        let mut urls = get_from_url(agent, url)
             .map_err(|err| format!("failed to get ics urls from {} {}", url, err))?;
         result.append(&mut urls);
     }
