@@ -13,6 +13,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # Check the 3 platforms and ensure there is not even a single warning
           - os: ubuntu-latest
             toolchain: stable
             clippyargs: -D clippy::pedantic -D warnings
@@ -23,15 +24,23 @@ jobs:
             toolchain: stable
             clippyargs: -D clippy::pedantic -D warnings
 
+          # Check nightly (potentially buggy -> continue-on-error) and maybe get some glances on soon to be lints
           - os: ubuntu-latest
             toolchain: nightly
             clippyargs: -W clippy::pedantic
-          - os: ubuntu-latest
-            toolchain: 1.47.0 # Alpine 3.13
-            clippyargs: -W clippy::pedantic -A unknown-lints -A clippy::unknown-clippy-lints
+
+          # Check if it is still running on older Rust versions.
+          # Sometimes they dont have lint bugfixes which results in false positives -> Dont error, just warn.
+          # Also some specified lints are not yet existing in the older rust version -> allow unknown lints.
+          # - os: ubuntu-latest
+          #   toolchain: 1.41.1 # Debian 10 Buster
+          #   clippyargs: -W clippy::pedantic -A unknown-lints -A clippy::unknown-clippy-lints
           - os: ubuntu-latest
             toolchain: 1.48.0 # Debian 11 Bullseye
             clippyargs: -W clippy::pedantic -A unknown-lints -A clippy::unknown-clippy-lints
+          - os: ubuntu-latest
+            toolchain: 1.52.0 # Alpine 3.14
+            clippyargs: -W clippy::pedantic -A unknown-lints
     steps:
       - uses: actions/checkout@v2
 
@@ -55,7 +64,7 @@ jobs:
           command: test
           args: --verbose --locked --all-features
 
-  release:
+  github-release:
     name: Release ${{ matrix.triple }}
     runs-on: ${{ matrix.os }}
     needs: test
@@ -71,27 +80,32 @@ jobs:
             triple: armv7-unknown-linux-gnueabihf
           - os: ubuntu-latest
             triple: aarch64-unknown-linux-gnu
+
           - os: macOS-latest
             triple: x86_64-apple-darwin
           - os: macOS-latest
             triple: aarch64-apple-darwin
+
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
           # https://github.com/briansmith/ring/issues/1167
           # - os: windows-latest
           #   triple: aarch64-pc-windows-msvc
-
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Get the version from the tag
+      - name: Set Artifact Name
         shell: bash
         run: |
           version=$(git describe --tags --match "v*.*.*" --always)
           echo "version is: $version"
           echo "GIT_TAG_VERSION=$version" >> $GITHUB_ENV
+
+          name="hawhh-calendarbot-downloader-$version-${{ matrix.triple }}"
+          echo "artifact name is: $name"
+          echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
 
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -101,7 +115,7 @@ jobs:
           target: ${{ matrix.triple }}
           toolchain: stable
 
-      - name: Build release
+      - name: Build
         uses: actions-rs/cargo@v1
         env:
           # TODO: Remove this once it's the default
@@ -111,17 +125,18 @@ jobs:
           args: --release --verbose --locked --all-features --target ${{ matrix.triple }}
           use-cross: ${{ runner.os == 'Linux' && matrix.triple != 'x86_64-unknown-linux-gnu' }}
 
-      - name: Pack release (-nix)
+      - name: Package (-nix)
         if: runner.os != 'Windows'
-        run: |
-          cd target/${{ matrix.triple }}/release
-          tar -czvf ../../../hawhh-calendarbot-downloader-${{ env.GIT_TAG_VERSION }}-${{ matrix.triple }}.tar.gz hawhh-calendarbot-downloader
-          cd -
-      - name: Pack release (windows)
+        run: >
+          tar --gzip -cvf ${{ env.ARTIFACT_NAME }}.tar.gz
+          LICENSE README.md
+          -C target/${{ matrix.triple }}/release hawhh-calendarbot-downloader
+      - name: Package (windows)
         if: runner.os == 'Windows'
         run: |
+          7z a ${{ env.ARTIFACT_NAME }}.zip LICENSE README.md
           cd target/${{ matrix.triple }}/release
-          7z a ../../../hawhh-calendarbot-downloader-${{ env.GIT_TAG_VERSION }}-${{ matrix.triple }}.zip hawhh-calendarbot-downloader.exe
+          7z a ../../../${{ env.ARTIFACT_NAME }}.zip hawhh-calendarbot-downloader.exe
           cd -
 
       - name: Upload Artifact
@@ -132,11 +147,10 @@ jobs:
             *.zip
             *.tar.gz
 
-      - name: GH Release
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:
-          draft: true
           files: |
             *.zip
             *.tar.gz
