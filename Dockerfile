@@ -8,13 +8,13 @@ RUN apk --no-cache upgrade \
 RUN mkdir -p src && echo "fn main() {}" > src/main.rs
 
 COPY Cargo.toml Cargo.lock ./
-RUN cargo build --release
+RUN cargo build --release --locked
 
 # We need to touch our real main.rs file or the cached one will be used.
 COPY . ./
 RUN touch src/main.rs
 
-RUN cargo build --release
+RUN cargo build --release --locked
 
 
 # Start building the final image
