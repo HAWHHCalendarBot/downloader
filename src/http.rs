@@ -4,11 +4,19 @@ use encoding::all::ISO_8859_1;
 use encoding::{DecoderTrap, Encoding};
 use ureq::{Agent, Request};
 
+const USER_AGENT: &str = concat!(
+    env!("CARGO_PKG_NAME"),
+    "/",
+    env!("CARGO_PKG_VERSION"),
+    " ",
+    env!("CARGO_PKG_REPOSITORY"),
+);
+
 fn get_with_headers(agent: &Agent, url: &str) -> Request {
     agent
         .get(url)
-        .set("user-agent", "github.com/HAWHHCalendarBot/downloader")
-        .set("from", "calendarbot@hawhh.de")
+        .set("user-agent", USER_AGENT)
+        .set("from", "calendarbot-downloader@hawhh.de")
 }
 
 pub fn get_text(agent: &Agent, url: &str) -> Result<String, String> {
