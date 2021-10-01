@@ -24,7 +24,7 @@ RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y bash git \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /var/cache/* /var/log/*
 
 WORKDIR /app
 VOLUME /app/eventfiles
