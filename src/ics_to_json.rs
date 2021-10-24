@@ -36,7 +36,7 @@ fn parse_one(
 
     for cap in event_regex.captures_iter(&sane_body) {
         let dozent = cap[3].trim();
-        let _uid = &cap[4];
+        // let uid = &cap[4];
 
         let description = parse_description(dozent);
 
