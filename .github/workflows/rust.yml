@@ -15,7 +15,6 @@ jobs:
         os:
           - ubuntu-latest
           - macos-latest
-          - windows-latest
         toolchain:
           - stable
         clippyargs:
@@ -31,20 +30,6 @@ jobs:
           - os: ubuntu-latest
             toolchain: nightly
             clippyargs: -W clippy::pedantic
-            features: --all-features
-
-          # Check if it is still running on older Rust versions.
-          # Sometimes they dont have lint bugfixes which results in false positives -> Dont error, just warn.
-          # Also some specified lints are not yet existing in the older rust version -> allow unknown lints.
-          # https://packages.debian.org/search?keywords=rustc
-          # https://pkgs.alpinelinux.org/packages?name=rust
-          - os: ubuntu-latest
-            toolchain: 1.48.0 # Debian 11 Bullseye
-            clippyargs: -A unknown-lints -A clippy::unknown-clippy-lints
-            features: --all-features
-          - os: ubuntu-latest
-            toolchain: 1.52.1 # Alpine 3.14
-            clippyargs: -A unknown-lints
             features: --all-features
     steps:
       - name: Setup Rust
@@ -85,23 +70,6 @@ jobs:
         include:
           - os: ubuntu-latest
             triple: x86_64-unknown-linux-gnu
-          - os: ubuntu-latest
-            triple: arm-unknown-linux-gnueabihf
-          - os: ubuntu-latest
-            triple: armv7-unknown-linux-gnueabihf
-          - os: ubuntu-latest
-            triple: aarch64-unknown-linux-gnu
-
-          - os: macos-latest
-            triple: x86_64-apple-darwin
-          - os: macos-latest
-            triple: aarch64-apple-darwin
-
-          - os: windows-latest
-            triple: x86_64-pc-windows-msvc
-          # https://github.com/briansmith/ring/issues/1167
-          # - os: windows-latest
-          #   triple: aarch64-pc-windows-msvc
     steps:
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
