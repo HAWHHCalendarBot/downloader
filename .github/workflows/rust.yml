@@ -6,31 +6,31 @@ on:
 
 jobs:
   test:
-    name: Test ${{ matrix.os }} ${{ matrix.toolchain }}
+    name: Test ${{ matrix.toolchain }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.toolchain == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
+        toolchain:
+          - stable
         os:
           - ubuntu-latest
           - macos-latest
-        toolchain:
-          - stable
         clippyargs:
           - -D clippy::pedantic -D warnings
         features:
           - --all-features
         include:
           # Check future versions and maybe get some glances on soon to be lints
-          - os: ubuntu-latest
-            toolchain: beta
+          - toolchain: beta
+            os: ubuntu-latest
+            features: --all-features
             clippyargs: -W clippy::pedantic -W clippy::nursery
+          - toolchain: nightly
+            os: ubuntu-latest
             features: --all-features
-          - os: ubuntu-latest
-            toolchain: nightly
             clippyargs: -W clippy::pedantic
-            features: --all-features
     steps:
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -68,8 +68,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            triple: x86_64-unknown-linux-gnu
+          - triple: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
     steps:
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -83,49 +83,41 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set Artifact Name
+      - name: Set artifact name
         shell: bash
         run: |
-          version=$(git describe --tags --match "v*.*.*" --always)
-          echo "version is: $version"
+          version="$(git describe --tags --match "v*.*.*" --always)"
+          echo "version: $version"
           echo "GIT_TAG_VERSION=$version" >> $GITHUB_ENV
 
           name="hawhh-calendarbot-downloader-$version-${{ matrix.triple }}"
-          echo "artifact name is: $name"
+          echo "artifact: $name"
           echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
 
       - name: Build
         uses: actions-rs/cargo@v1
-        env:
-          # TODO: Remove this once macos-11 is macos-latest
-          SDKROOT: /Library/Developer/CommandLineTools/SDKs/MacOSX11.1.sdk
         with:
           command: build
           args: --release --verbose --locked --all-features --target ${{ matrix.triple }}
           use-cross: ${{ runner.os == 'Linux' && matrix.triple != 'x86_64-unknown-linux-gnu' }}
 
-      - name: Package (-nix)
+      - name: Package (*nix)
         if: runner.os != 'Windows'
         run: >
-          tar --gzip -cvf ${{ env.ARTIFACT_NAME }}.tar.gz
+          tar -cv
           LICENSE README.md
-          -C target/${{ matrix.triple }}/release hawhh-calendarbot-downloader
-      - name: Package (windows)
-        if: runner.os == 'Windows'
-        run: |
-          7z a ${{ env.ARTIFACT_NAME }}.zip LICENSE README.md
-          cd target/${{ matrix.triple }}/release
-          7z a ../../../${{ env.ARTIFACT_NAME }}.zip hawhh-calendarbot-downloader.exe
-          cd -
+          -C target/${{ matrix.triple }}/release/ hawhh-calendarbot-downloader
+          | gzip --best > ${{ env.ARTIFACT_NAME }}.tar.gz
 
-      - uses: actions/upload-artifact@v2
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.triple }}
           path: |
             *.zip
             *.tar.gz
 
-      - name: GitHub Release
+      - name: Create GitHub release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v1
         with:

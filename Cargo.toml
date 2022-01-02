@@ -1,12 +1,11 @@
 [package]
 name = "hawhh-calendarbot-downloader"
+description = "This tool downloads ICS Files and parses them into a generic JSON known to this project"
 version = "3.0.2"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/HAWHHCalendarBot/downloader"
 authors = ["EdJoPaTo <calendarbot-downloader@edjopato.de>"]
 edition = "2021"
-rust-version = "1.56"
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
