@@ -12,16 +12,15 @@ const SOURCE_URLS: &[&str] = &[
     "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
 ];
 
-pub fn get_all(agent: &Agent) -> Result<Vec<Url>, String> {
+pub fn get_all(agent: &Agent) -> Vec<Url> {
     let mut result: Vec<Url> = Vec::new();
-
     for url in SOURCE_URLS {
-        let mut urls = get_from_url(agent, url)
-            .map_err(|err| format!("failed to get ics urls from {} {}", url, err))?;
-        result.append(&mut urls);
+        match get_from_url(agent, url) {
+            Ok(mut urls) => result.append(&mut urls),
+            Err(err) => println!("WARNING: failed to get ics urls from {} {}", url, err),
+        }
     }
-
-    Ok(result)
+    result
 }
 
 fn get_from_url(agent: &Agent, base_url: &str) -> Result<Vec<Url>, String> {

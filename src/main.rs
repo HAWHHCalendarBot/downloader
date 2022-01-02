@@ -33,7 +33,7 @@ fn main() {
 fn the_loop() -> Result<(), String> {
     let mut all_events: Vec<EventEntry> = Vec::new();
 
-    let mut ics_events = part_ics()?;
+    let mut ics_events = part_ics();
     println!("ICS events: {}", ics_events.len());
     all_events.append(&mut ics_events);
 
@@ -49,11 +49,11 @@ fn the_loop() -> Result<(), String> {
     Ok(())
 }
 
-fn part_ics() -> Result<Vec<EventEntry>, String> {
+fn part_ics() -> Vec<EventEntry> {
     let agent = ureq::AgentBuilder::new().build();
     let parser = ics_to_json::IcsToJson::new();
 
-    let urls = ics_urls::get_all(&agent)?;
+    let urls = ics_urls::get_all(&agent);
     let url_amount = urls.len();
     println!("ICS total urls: {}", url_amount);
 
@@ -85,5 +85,5 @@ fn part_ics() -> Result<Vec<EventEntry>, String> {
     }
     println!("ICS downloaded files: {}", successful);
 
-    Ok(entries)
+    entries
 }
