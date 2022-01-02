@@ -17,7 +17,7 @@ pub fn get_all(agent: &Agent) -> Vec<Url> {
     for url in SOURCE_URLS {
         match get_from_url(agent, url) {
             Ok(mut urls) => result.append(&mut urls),
-            Err(err) => println!("WARNING: failed to get ics urls from {} {}", url, err),
+            Err(err) => println!("WARNING: skip events from url {} {}", url, err),
         }
     }
     result
