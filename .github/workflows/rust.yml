@@ -42,6 +42,12 @@ jobs:
 
       - uses: actions/checkout@v2
 
+      - name: Fetch dependencies
+        uses: actions-rs/cargo@v1
+        with:
+          command: fetch
+          args: --verbose --locked
+
       - name: Check clippy
         uses: actions-rs/cargo@v1
         with:
@@ -93,6 +99,12 @@ jobs:
           name="hawhh-calendarbot-downloader-$version-${{ matrix.triple }}"
           echo "artifact: $name"
           echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
+
+      - name: Fetch dependencies
+        uses: actions-rs/cargo@v1
+        with:
+          command: fetch
+          args: --verbose --locked
 
       - name: Build
         uses: actions-rs/cargo@v1
