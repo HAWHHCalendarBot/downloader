@@ -41,7 +41,7 @@ pub fn save_events(all: &[EventEntry]) {
         }
 
         all_events.push(key.clone());
-        expected_files.push(key.replace("/", "-"));
+        expected_files.push(key.replace('/', "-"));
     }
 
     all_events.sort();
@@ -97,7 +97,7 @@ fn get_grouped(all: &[EventEntry]) -> HashMap<String, Vec<EventEntry>> {
 }
 
 fn save_events_to_file(name: &str, events: &[EventEntry]) -> HasChanged {
-    let filename = format!("{}.json", name.replace("/", "-"));
+    let filename = format!("{}.json", name.replace('/', "-"));
     let json =
         serde_json::to_string_pretty(&events).expect("could not serialize the events to json");
 
