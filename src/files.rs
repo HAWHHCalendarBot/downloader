@@ -8,7 +8,6 @@ use itertools::Itertools;
 
 use crate::EventEntry;
 
-#[derive(PartialEq)]
 enum HasChanged {
     Changed,
     Unchanged,
@@ -36,7 +35,7 @@ pub fn save_events(all: &[EventEntry]) {
     for key in grouped.keys() {
         let events = grouped.get(key).unwrap();
         let has_changed = save_events_to_file(key, events);
-        if has_changed == HasChanged::Changed {
+        if matches!(has_changed, HasChanged::Changed) {
             changed_events.push(key.clone());
         }
 
