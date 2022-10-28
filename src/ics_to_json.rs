@@ -55,19 +55,19 @@ fn parse_one(
 fn parse_datetime(raw: &str) -> Result<String, String> {
     let tless = raw.replace('T', " ");
     let naive = NaiveDateTime::parse_from_str(&tless, "%Y%m%d %H%M%S")
-        .map_err(|err| format!("parse_datetime failed {} {}", raw, err))?;
+        .map_err(|err| format!("parse_datetime failed {raw} {err}"))?;
     let date_time = Berlin.from_local_datetime(&naive).unwrap();
     // let nanos = date_time.timestamp_millis();
     // let offset = date_time.offset().to_string().replace(":", "");
-    // let result = format!("/Date({}{})/", nanos, offset);
+    // let result = format!("/Date({nanos}{offset})/");
     Ok(date_time.to_rfc3339())
 }
 
 fn parse_description(dozent: &str) -> String {
     if dozent.is_empty() {
-        "".to_owned()
+        String::new()
     } else {
-        format!("Dozent: {}", dozent)
+        format!("Dozent: {dozent}")
     }
 }
 

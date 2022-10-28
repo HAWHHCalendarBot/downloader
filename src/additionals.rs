@@ -28,12 +28,12 @@ pub fn get() -> Result<Vec<EventEntry>, String> {
     pull()?;
 
     let files = get_filenames()
-        .map_err(|err| format!("failed to read additional event directory {}", err))?;
+        .map_err(|err| format!("failed to read additional event directory {err}"))?;
     println!("Additionals: found {} event files", files.len());
 
     let mut events: Vec<EventEntry> = Vec::new();
     for file in files {
-        let mut file_events = get_file(&file).map_err(|err| format!("failed! {}", err))?;
+        let mut file_events = get_file(&file).map_err(|err| format!("failed! {err}"))?;
         events.append(&mut file_events);
     }
 
@@ -47,10 +47,10 @@ fn pull() -> Result<(), String> {
             .arg("--ff-only")
             .current_dir("additionalEventsGithub")
             .status()
-            .map_err(|err| format!("failed to pull additional event repo {}", err))?
+            .map_err(|err| format!("failed to pull additional event repo {err}"))?
     } else {
         Command::new("git")
-            .args(&[
+            .args([
                 "clone",
                 "-q",
                 "--depth",
@@ -59,13 +59,13 @@ fn pull() -> Result<(), String> {
                 "additionalEventsGithub",
             ])
             .status()
-            .map_err(|err| format!("failed to clone additional event repo {}", err))?
+            .map_err(|err| format!("failed to clone additional event repo {err}"))?
     };
 
     if status.success() {
         Ok(())
     } else {
-        let error_message = format!("failed to clone/pull. Status code {}", status);
+        let error_message = format!("failed to clone/pull. Status code {status}");
         Err(error_message)
     }
 }
@@ -90,9 +90,9 @@ fn get_filenames() -> Result<Vec<String>, io::Error> {
 fn get_file(name: &str) -> Result<Vec<EventEntry>, String> {
     let path = Path::new(FOLDER_GIT).join("events").join(name);
     let content = fs::read_to_string(path)
-        .map_err(|err| format!("failed to read event file {} {}", name, err))?;
+        .map_err(|err| format!("failed to read event file {name} {err}"))?;
     let additionals: Vec<AdditionalEvent> = serde_json::from_str(&content)
-        .map_err(|err| format!("failed to parse event file {} {}", name, err))?;
+        .map_err(|err| format!("failed to parse event file {name} {err}"))?;
 
     let mut events: Vec<EventEntry> = Vec::with_capacity(additionals.capacity());
     for additional in additionals {
@@ -115,9 +115,9 @@ fn parse_additional_event_to_event_entry(before: &AdditionalEvent) -> Result<Eve
 }
 
 fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> Result<String, String> {
-    let string = format!("{} {} {} {}", year, month, day, time);
+    let string = format!("{year} {month} {day} {time}");
     let naive = NaiveDateTime::parse_from_str(&string, "%Y %m %d %H:%M")
-        .map_err(|err| format!("parse_datetime failed {} {}", string, err))?;
+        .map_err(|err| format!("parse_datetime failed {string} {err}"))?;
     let date_time = Berlin.from_local_datetime(&naive).unwrap();
     Ok(date_time.to_rfc3339())
 }

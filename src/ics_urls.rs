@@ -18,7 +18,7 @@ pub fn get_all(agent: &Agent) -> Vec<Url> {
     for url in SOURCE_URLS {
         match get_from_url(agent, url) {
             Ok(mut urls) => result.append(&mut urls),
-            Err(err) => println!("WARNING: skip events from url {} {}", url, err),
+            Err(err) => println!("WARNING: skip events from url {url} {err}"),
         }
     }
     result
@@ -28,10 +28,10 @@ fn get_from_url(agent: &Agent, base_url: &str) -> Result<Vec<Url>, String> {
     let body = get_text(agent, base_url)?;
 
     let urls =
-        get_from_body(base_url, &body).map_err(|err| format!("parsing urls failed {}", err))?;
+        get_from_body(base_url, &body).map_err(|err| format!("parsing urls failed {err}"))?;
 
     if urls.is_empty() {
-        println!("WARNING: no ics urls from url {}", base_url);
+        println!("WARNING: no ics urls from url {base_url}");
     }
 
     Ok(urls)

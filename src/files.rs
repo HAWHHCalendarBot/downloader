@@ -46,8 +46,8 @@ pub fn save_events(all: &[EventEntry]) {
 
     for existing_file in read_existing_eventfiles().unwrap() {
         if !expected_files.contains(&existing_file) {
-            let filename = format!("{}.json", existing_file);
-            let path = Path::new(FOLDER).join(&filename);
+            let filename = format!("{existing_file}.json");
+            let path = Path::new(FOLDER).join(filename);
             fs::remove_file(path).expect("failed removing superflous event file");
             removed_events.push(existing_file);
         }
@@ -55,12 +55,12 @@ pub fn save_events(all: &[EventEntry]) {
 
     if !changed_events.is_empty() {
         changed_events.sort();
-        println!("changed {} {:?}", changed_events.len(), changed_events);
+        println!("changed {} {changed_events:?}", changed_events.len());
     }
 
     if !removed_events.is_empty() {
         removed_events.sort();
-        println!("deleted {} {:?}", removed_events.len(), removed_events);
+        println!("deleted {} {removed_events:?}", removed_events.len());
     }
 }
 
@@ -100,7 +100,7 @@ fn save_events_to_file(name: &str, events: &[EventEntry]) -> HasChanged {
 }
 
 fn write_only_changed(filename: &str, content: &str) -> Result<HasChanged, io::Error> {
-    let path = Path::new(FOLDER).join(&filename);
+    let path = Path::new(FOLDER).join(filename);
     if let Ok(current) = fs::read_to_string(&path) {
         if current == content {
             return Ok(HasChanged::Unchanged);

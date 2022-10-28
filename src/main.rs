@@ -62,7 +62,7 @@ fn part_ics() -> Vec<EventEntry> {
 
     let urls = ics_urls::get_all(&agent);
     let url_amount = urls.len();
-    println!("ICS total urls: {}", url_amount);
+    println!("ICS total urls: {url_amount}");
 
     let mut entries = Vec::new();
     let mut successful: usize = 0;
@@ -76,21 +76,21 @@ fn part_ics() -> Vec<EventEntry> {
                 entries.append(&mut one);
                 successful += 1;
             }
-            Err(err) => println!("WARNING: url will be skipped: {}", err),
+            Err(err) => println!("WARNING: url will be skipped: {err}"),
         }
 
         #[cfg(debug_assertions)]
         {
             current += 1;
             if current % 25 == 0 {
-                println!("ICS file download {:4}/{}", current, url_amount);
+                println!("ICS file download {current:4}/{url_amount}");
             }
         }
 
         #[cfg(not(debug_assertions))]
         sleep(WAIT_BETWEEEN_REQUESTS);
     }
-    println!("ICS downloaded files: {}", successful);
+    println!("ICS downloaded files: {successful}");
 
     entries
 }
