@@ -5,6 +5,19 @@ on:
   pull_request:
 
 jobs:
+  rustfmt:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Setup Rust
+        shell: bash -eux {0}
+        run: |
+          rustup --version
+          rustup show
+          rustup toolchain install stable --profile minimal --component rustfmt
+          rustup default stable
+      - uses: actions/checkout@v3
+      - run: cargo fmt --check --verbose
+
   test:
     name: Test ${{ matrix.toolchain }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -15,8 +28,8 @@ jobs:
         toolchain:
           - stable
         os:
-          - ubuntu-20.04
-          - macos-11
+          - ubuntu-22.04
+          - macos-12
         clippyargs:
           - -D clippy::pedantic -D warnings
         features:
@@ -24,21 +37,21 @@ jobs:
         include:
           # Check future versions and maybe get some glances on soon to be lints
           - toolchain: beta
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             features: --all-features
             clippyargs: -W clippy::pedantic -W clippy::nursery
           - toolchain: nightly
-            os: ubuntu-20.04
+            os: ubuntu-22.04
             features: --all-features
             clippyargs: -W clippy::pedantic
     steps:
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          components: clippy
-          override: true
-          profile: minimal
-          toolchain: ${{ matrix.toolchain }}
+        shell: bash -eux {0}
+        run: |
+          rustup --version
+          rustup show
+          rustup toolchain install ${{ matrix.toolchain }} --profile minimal --component clippy
+          rustup default ${{ matrix.toolchain }}
 
       - uses: actions/checkout@v3
 
@@ -75,15 +88,15 @@ jobs:
       matrix:
         include:
           - triple: x86_64-unknown-linux-gnu
-            os: ubuntu-20.04
+            os: ubuntu-22.04
     steps:
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          override: true
-          profile: minimal
-          target: ${{ matrix.triple }}
-          toolchain: stable
+        shell: bash -eux {0}
+        run: |
+          rustup --version
+          rustup show
+          rustup toolchain install stable --profile minimal --target ${{ matrix.triple }}
+          rustup default stable
 
       - uses: actions/checkout@v3
         with:
@@ -101,17 +114,13 @@ jobs:
           echo "ARTIFACT_NAME=$name" >> $GITHUB_ENV
 
       - name: Fetch dependencies
-        uses: actions-rs/cargo@v1
-        with:
-          command: fetch
-          args: --verbose --locked
+        run: cargo fetch --verbose --locked
 
       - name: Build
         uses: actions-rs/cargo@v1
         with:
           command: build
           args: --release --verbose --locked --all-features --target ${{ matrix.triple }}
-          use-cross: ${{ runner.os == 'Linux' && matrix.triple != 'x86_64-unknown-linux-gnu' }}
 
       - name: Package tar.gz (*nix)
         if: runner.os != 'Windows'
