@@ -27,12 +27,12 @@ fn main() {
             Ok(_) => {
                 error_count = 0;
                 println!("download successful");
-            },
+            }
             Err(err) => {
                 println!("download failed... {err}");
                 error_count += 1;
                 assert!(error_count <= 3, "too many download errors");
-            },
+            }
         }
 
         println!("Wait till next download...\n\n");
