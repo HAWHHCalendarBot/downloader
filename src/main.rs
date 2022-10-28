@@ -19,10 +19,20 @@ const WAIT_BETWEEEN_REQUESTS: Duration = Duration::from_millis(200); // 200 mill
 fn main() {
     files::ensure_folders_exist().expect("failed to create folders");
 
+    let mut error_count = 0;
+
     loop {
         println!("Its time for another download... Start!");
-        if let Err(err) = the_loop() {
-            println!("download failed... {}", err);
+        match the_loop() {
+            Ok(_) => {
+                error_count = 0;
+                println!("download successful");
+            },
+            Err(err) => {
+                println!("download failed... {err}");
+                error_count += 1;
+                assert!(error_count <= 3, "too many download errors");
+            },
         }
 
         println!("Wait till next download...\n\n");
@@ -42,9 +52,6 @@ fn the_loop() -> Result<(), String> {
     all_events.append(&mut additional_events);
 
     files::save_events(&all_events);
-
-    println!("download successful");
-    files::confirm_successful_run();
 
     Ok(())
 }

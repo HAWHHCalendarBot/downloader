@@ -20,10 +20,6 @@ pub fn ensure_folders_exist() -> Result<(), io::Error> {
     dir.recursive(true).create(FOLDER)
 }
 
-pub fn confirm_successful_run() {
-    fs::write(".last-successful-run", "").expect("failed to write last-successful-run");
-}
-
 pub fn save_events(all: &[EventEntry]) {
     let mut all_events: Vec<String> = Vec::new();
     let mut expected_files: Vec<String> = Vec::new();

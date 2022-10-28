@@ -23,7 +23,7 @@ RUN cargo build --release --frozen --offline
 FROM docker.io/library/debian:bullseye-slim
 RUN apt-get update \
     && apt-get upgrade -y \
-    && apt-get install -y bash git \
+    && apt-get install -y git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/cache/* /var/log/*
 
@@ -32,8 +32,5 @@ VOLUME /app/eventfiles
 VOLUME /app/additionalEventsGithub
 
 COPY --from=builder /build/target/release/hawhh-calendarbot-downloader /usr/bin/
-
-HEALTHCHECK --interval=5m \
-    CMD bash -c '[[ $(find . -maxdepth 1 -name ".last-successful-run" -mmin "-250" -print | wc -l) == "1" ]]'
 
 ENTRYPOINT ["hawhh-calendarbot-downloader"]
