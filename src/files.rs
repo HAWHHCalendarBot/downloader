@@ -115,16 +115,15 @@ fn write_only_changed(filename: &str, content: &str) -> Result<HasChanged, io::E
 fn read_existing_eventfiles() -> Result<Vec<String>, io::Error> {
     let mut list: Vec<String> = Vec::new();
     for maybe_entry in fs::read_dir(FOLDER)? {
-        let filename = maybe_entry?
-            .file_name()
-            .into_string()
-            .expect("filename contains something that can not be read easily with rust");
-
-        #[allow(clippy::case_sensitive_file_extension_comparisons)]
-        if filename.to_lowercase().ends_with(".json") {
-            let len = filename.len();
-            let without_extension = &filename[..len - 4 - 1];
-            list.push(without_extension.to_owned());
+        let path = maybe_entry?.path();
+        let is_json = path.is_file()
+            && path
+                .extension()
+                .map_or(false, |ext| ext.eq_ignore_ascii_case("json"));
+        if is_json {
+            if let Some(name) = path.file_stem().and_then(std::ffi::OsStr::to_str) {
+                list.push(name.to_string());
+            }
         }
     }
 

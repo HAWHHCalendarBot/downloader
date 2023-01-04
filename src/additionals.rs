@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{fs, io};
 
@@ -19,21 +19,20 @@ pub struct AdditionalEvent {
     pub endtime: String,
 }
 
-const FOLDER_GIT: &str = "additionalEventsGithub";
-
 #[allow(clippy::non_ascii_literal)]
 const DESCRIPTION: &str = "Dies ist eine zusätzliche, inoffizielle Veranstaltung: https://github.com/HAWHHCalendarBot/AdditionalEvents";
 
 pub fn get() -> Result<Vec<EventEntry>, String> {
     pull()?;
 
-    let files = get_filenames()
+    let files = get_file_list()
         .map_err(|err| format!("failed to read additional event directory {err}"))?;
     println!("Additionals: found {} event files", files.len());
 
     let mut events: Vec<EventEntry> = Vec::new();
     for file in files {
-        let mut file_events = get_file(&file).map_err(|err| format!("failed! {err}"))?;
+        let mut file_events = get_file(&file)
+            .map_err(|err| format!("Additionals failed with file {:?} {err}", file.file_name()))?;
         events.append(&mut file_events);
     }
 
@@ -70,29 +69,26 @@ fn pull() -> Result<(), String> {
     }
 }
 
-fn get_filenames() -> Result<Vec<String>, io::Error> {
-    let mut list: Vec<String> = Vec::new();
+fn get_file_list() -> Result<Vec<PathBuf>, io::Error> {
+    let mut list: Vec<PathBuf> = Vec::new();
     for maybe_entry in fs::read_dir("additionalEventsGithub/events")? {
-        let filename = maybe_entry?
-            .file_name()
-            .into_string()
-            .expect("filename contains something that can not be read easily with rust");
-
-        #[allow(clippy::case_sensitive_file_extension_comparisons)]
-        if filename.to_lowercase().ends_with(".json") {
-            list.push(filename);
+        let path = maybe_entry?.path();
+        let is_json = path.is_file()
+            && path
+                .extension()
+                .map_or(false, |ext| ext.eq_ignore_ascii_case("json"));
+        if is_json {
+            list.push(path);
         }
     }
 
     Ok(list)
 }
 
-fn get_file(name: &str) -> Result<Vec<EventEntry>, String> {
-    let path = Path::new(FOLDER_GIT).join("events").join(name);
-    let content = fs::read_to_string(path)
-        .map_err(|err| format!("failed to read event file {name} {err}"))?;
-    let additionals: Vec<AdditionalEvent> = serde_json::from_str(&content)
-        .map_err(|err| format!("failed to parse event file {name} {err}"))?;
+fn get_file(path: &Path) -> Result<Vec<EventEntry>, String> {
+    let content = fs::read_to_string(path).map_err(|err| format!("failed to read file {err}"))?;
+    let additionals: Vec<AdditionalEvent> =
+        serde_json::from_str(&content).map_err(|err| format!("failed to parse {err}"))?;
 
     let mut events: Vec<EventEntry> = Vec::with_capacity(additionals.capacity());
     for additional in additionals {
