@@ -6,7 +6,7 @@ use chrono::{NaiveDateTime, TimeZone};
 use chrono_tz::Europe::Berlin;
 use serde::{Deserialize, Serialize};
 
-use crate::event::EventEntry;
+use crate::event_entry::EventEntry;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AdditionalEvent {
@@ -19,7 +19,6 @@ pub struct AdditionalEvent {
     pub endtime: String,
 }
 
-#[allow(clippy::non_ascii_literal)]
 const DESCRIPTION: &str = "Dies ist eine zusätzliche, inoffizielle Veranstaltung: https://github.com/HAWHHCalendarBot/AdditionalEvents";
 
 pub fn get() -> Result<Vec<EventEntry>, String> {

@@ -3,10 +3,10 @@
 use std::thread::sleep;
 use std::time::Duration;
 
-use crate::event::EventEntry;
+use crate::event_entry::EventEntry;
 
 mod additionals;
-mod event;
+mod event_entry;
 mod files;
 mod http;
 mod ics_to_json;

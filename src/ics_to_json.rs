@@ -3,7 +3,7 @@ use chrono_tz::Europe::Berlin;
 use once_cell::sync::Lazy;
 use regex::Regex;
 
-use crate::event::EventEntry;
+use crate::event_entry::EventEntry;
 
 pub fn parse(ics_body: &str) -> Result<Vec<EventEntry>, String> {
     static EVENT_REGEX: Lazy<Regex> = Lazy::new(|| {
