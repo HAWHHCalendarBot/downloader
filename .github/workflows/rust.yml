@@ -6,7 +6,7 @@ on:
 
 jobs:
   rustfmt:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Setup Rust
         shell: bash -eux {0}
@@ -28,8 +28,8 @@ jobs:
         toolchain:
           - stable
         os:
-          - ubuntu-22.04
-          - macos-12
+          - ubuntu-latest
+          - macos-latest
         clippyargs:
           - -D clippy::pedantic -D warnings
         features:
@@ -37,11 +37,11 @@ jobs:
         include:
           # Check future versions and maybe get some glances on soon to be lints
           - toolchain: beta
-            os: ubuntu-22.04
+            os: ubuntu-latest
             features: --all-features
             clippyargs: -W clippy::pedantic -W clippy::nursery
           - toolchain: nightly
-            os: ubuntu-22.04
+            os: ubuntu-latest
             features: --all-features
             clippyargs: -W clippy::pedantic
     steps:
@@ -88,7 +88,7 @@ jobs:
       matrix:
         include:
           - triple: x86_64-unknown-linux-gnu
-            os: ubuntu-22.04
+            os: ubuntu-latest
     steps:
       - name: Setup Rust
         shell: bash -eux {0}
