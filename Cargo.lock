@@ -265,6 +265,7 @@ dependencies = [
  "chrono-tz",
  "encoding",
  "itertools",
+ "once_cell",
  "regex",
  "serde",
  "serde_json",

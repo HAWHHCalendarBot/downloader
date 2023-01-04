@@ -1,40 +1,20 @@
 use chrono::{NaiveDateTime, TimeZone};
 use chrono_tz::Europe::Berlin;
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 use crate::event::EventEntry;
 
-const EVENT_REGEX: &str = r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#;
-const LOCATION_REGEX: &str = r#"Stand \d{2}-\d{2}-\d{4}"#;
+pub fn parse(ics_body: &str) -> Result<Vec<EventEntry>, String> {
+    static EVENT_REGEX: Lazy<Regex> = Lazy::new(|| {
+        Regex::new(r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#).unwrap()
+    });
 
-pub struct IcsToJson {
-    event_regex: Regex,
-    location_regex: Regex,
-}
-
-impl IcsToJson {
-    pub fn new() -> Self {
-        Self {
-            event_regex: Regex::new(EVENT_REGEX).expect("Could not create ics regex"),
-            location_regex: Regex::new(LOCATION_REGEX).expect("Could not create location regex"),
-        }
-    }
-
-    pub fn parse(&self, ics_body: &str) -> Result<Vec<EventEntry>, String> {
-        parse_one(&self.event_regex, &self.location_regex, ics_body)
-    }
-}
-
-fn parse_one(
-    event_regex: &Regex,
-    location_regex: &Regex,
-    ics_body: &str,
-) -> Result<Vec<EventEntry>, String> {
     let mut result: Vec<EventEntry> = Vec::new();
 
     let sane_body = ics_body.replace("\r\n", "\n");
 
-    for cap in event_regex.captures_iter(&sane_body) {
+    for cap in EVENT_REGEX.captures_iter(&sane_body) {
         let dozent = cap[3].trim();
         // let uid = &cap[4];
 
@@ -42,7 +22,7 @@ fn parse_one(
 
         result.push(EventEntry {
             name: cap[1].trim().to_owned(),
-            location: parse_location(location_regex, cap[2].trim()),
+            location: parse_location(cap[2].trim()),
             description,
             start_time: parse_datetime(cap[5].trim())?,
             end_time: parse_datetime(cap[6].trim())?,
@@ -71,8 +51,11 @@ fn parse_description(dozent: &str) -> String {
     }
 }
 
-fn parse_location(location_regex: &Regex, raw: &str) -> String {
-    location_regex.replace_all(raw, "").trim().to_string()
+fn parse_location(raw: &str) -> String {
+    static LOCATION_REGEX: Lazy<Regex> =
+        Lazy::new(|| Regex::new(r#"Stand \d{2}-\d{2}-\d{4}"#).unwrap());
+
+    LOCATION_REGEX.replace_all(raw, "").trim().to_string()
 }
 
 #[test]
@@ -100,15 +83,13 @@ fn some_dozent_ends_up_as_description() {
 
 #[test]
 fn location_gets_stand_removed() {
-    let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
     assert_eq!(
         "Stiftstr69 R304a",
-        parse_location(&regex, "Stiftstr69 R304a  Stand 12-03-2020")
+        parse_location("Stiftstr69 R304a  Stand 12-03-2020")
     );
 }
 
 #[test]
 fn location_being_only_stand_ends_up_empty() {
-    let regex = Regex::new(LOCATION_REGEX).expect("failed to parse Regex");
-    assert_eq!("", parse_location(&regex, "Stand 12-03-2020"));
+    assert_eq!("", parse_location("Stand 12-03-2020"));
 }

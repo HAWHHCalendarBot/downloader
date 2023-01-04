@@ -2,6 +2,7 @@ use std::io::Read;
 
 use encoding::all::ISO_8859_1;
 use encoding::{DecoderTrap, Encoding};
+use once_cell::sync::Lazy;
 use ureq::{Agent, Request};
 
 const USER_AGENT: &str = concat!(
@@ -12,25 +13,27 @@ const USER_AGENT: &str = concat!(
     env!("CARGO_PKG_REPOSITORY"),
 );
 
-fn get_with_headers(agent: &Agent, url: &str) -> Request {
-    agent
+fn get_with_headers(url: &str) -> Request {
+    static AGENT: Lazy<Agent> =
+        Lazy::new(|| ureq::AgentBuilder::new().user_agent(USER_AGENT).build());
+
+    AGENT
         .get(url)
-        .set("user-agent", USER_AGENT)
         .set("from", "calendarbot-downloader@hawhh.de")
 }
 
-pub fn get_text(agent: &Agent, url: &str) -> Result<String, String> {
-    get_with_headers(agent, url)
+pub fn get_text(url: &str) -> Result<String, String> {
+    get_with_headers(url)
         .call()
         .map_err(|err| format!("failed to get {err}"))?
         .into_string()
         .map_err(|err| format!("failed to read string {url} {err}"))
 }
 
-pub fn get_haw_text(agent: &Agent, url: &str) -> Result<String, String> {
+pub fn get_haw_text(url: &str) -> Result<String, String> {
     let mut bytes: Vec<u8> = vec![];
 
-    get_with_headers(agent, url)
+    get_with_headers(url)
         .call()
         .map_err(|err| format!("failed to get {err}"))?
         .into_reader()

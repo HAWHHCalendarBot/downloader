@@ -57,10 +57,13 @@ fn the_loop() -> Result<(), String> {
 }
 
 fn part_ics() -> Vec<EventEntry> {
-    let agent = ureq::AgentBuilder::new().build();
-    let parser = ics_to_json::IcsToJson::new();
+    fn one_url(url: &str) -> Result<Vec<EventEntry>, String> {
+        let content = http::get_haw_text(url)?;
+        let entries = ics_to_json::parse(&content)?;
+        Ok(entries)
+    }
 
-    let urls = ics_urls::get_all(&agent);
+    let urls = ics_urls::get_all();
     let url_amount = urls.len();
     println!("ICS total urls: {url_amount}");
 
@@ -71,7 +74,7 @@ fn part_ics() -> Vec<EventEntry> {
     let mut current: usize = 0;
 
     for url in urls {
-        match http::get_haw_text(&agent, url.as_str()).and_then(|content| parser.parse(&content)) {
+        match one_url(url.as_str()) {
             Ok(mut one) => {
                 entries.append(&mut one);
                 successful += 1;
