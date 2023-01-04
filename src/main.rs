@@ -43,13 +43,8 @@ fn main() {
 fn the_loop() -> Result<(), String> {
     let mut all_events: Vec<EventEntry> = Vec::new();
 
-    let mut ics_events = part_ics();
-    println!("ICS events: {}", ics_events.len());
-    all_events.append(&mut ics_events);
-
-    let mut additional_events = additionals::get()?;
-    println!("Additional events: {}", additional_events.len());
-    all_events.append(&mut additional_events);
+    all_events.append(&mut part_ics());
+    all_events.append(&mut additionals::get()?);
 
     files::save_events(&all_events);
 
@@ -79,7 +74,7 @@ fn part_ics() -> Vec<EventEntry> {
                 entries.append(&mut one);
                 successful += 1;
             }
-            Err(err) => println!("WARNING: url will be skipped: {err}"),
+            Err(err) => println!("WARNING: skip ics file url {url} {err}"),
         }
 
         #[cfg(debug_assertions)]
@@ -93,7 +88,9 @@ fn part_ics() -> Vec<EventEntry> {
         #[cfg(not(debug_assertions))]
         sleep(WAIT_BETWEEEN_REQUESTS);
     }
-    println!("ICS downloaded files: {successful}");
-
+    println!(
+        "ICS downloaded {successful} urls with {} events",
+        entries.len()
+    );
     entries
 }

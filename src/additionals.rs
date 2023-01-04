@@ -35,7 +35,7 @@ pub fn get() -> Result<Vec<EventEntry>, String> {
             .map_err(|err| format!("Additionals failed with file {:?} {err}", file.file_name()))?;
         events.append(&mut file_events);
     }
-
+    println!("Additional events: {}", events.len());
     Ok(events)
 }
 
