@@ -42,7 +42,7 @@ pub fn save_events(all: &[EventEntry]) {
     all_events.sort();
 
     let all_txt_content = all_events.join("\n") + "\n";
-    write_only_changed("all.txt", &all_txt_content).expect("failed to write all.txt");
+    write_when_different("all.txt", &all_txt_content).expect("failed to write all.txt");
 
     for existing_file in read_existing_eventfiles().unwrap() {
         if !expected_files.contains(&existing_file) {
@@ -95,11 +95,10 @@ fn save_events_to_file(name: &str, events: &[EventEntry]) -> HasChanged {
     let filename = format!("{}.json", name.replace('/', "-"));
     let json =
         serde_json::to_string_pretty(&events).expect("could not serialize the events to json");
-
-    write_only_changed(&filename, &json).expect("failed to write file")
+    write_when_different(&filename, &json).expect("failed to write file")
 }
 
-fn write_only_changed(filename: &str, content: &str) -> Result<HasChanged, io::Error> {
+fn write_when_different(filename: &str, content: &str) -> Result<HasChanged, io::Error> {
     let path = Path::new(FOLDER).join(filename);
     if let Ok(current) = fs::read_to_string(&path) {
         if current == content {
