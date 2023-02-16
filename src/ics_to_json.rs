@@ -1,14 +1,13 @@
 use chrono::{NaiveDateTime, TimeZone};
 use chrono_tz::Europe::Berlin;
-use once_cell::sync::Lazy;
-use regex::Regex;
+use lazy_regex::{lazy_regex, Lazy, Regex};
 
 use crate::event_entry::EventEntry;
 
 pub fn parse(ics_body: &str) -> Result<Vec<EventEntry>, String> {
-    static EVENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#).unwrap()
-    });
+    static EVENT_REGEX: Lazy<Regex> = lazy_regex!(
+        r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#
+    );
 
     let mut result: Vec<EventEntry> = Vec::new();
 
@@ -52,8 +51,7 @@ fn parse_description(dozent: &str) -> String {
 }
 
 fn parse_location(raw: &str) -> String {
-    static LOCATION_REGEX: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"Stand \d{2}-\d{2}-\d{4}"#).unwrap());
+    static LOCATION_REGEX: Lazy<Regex> = lazy_regex!(r#"Stand \d{2}-\d{2}-\d{4}"#);
 
     LOCATION_REGEX.replace_all(raw, "").trim().to_string()
 }

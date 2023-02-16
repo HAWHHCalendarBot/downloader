@@ -1,5 +1,5 @@
+use lazy_regex::{lazy_regex, Regex};
 use once_cell::sync::Lazy;
-use regex::Regex;
 use url::Url;
 
 use crate::http::get_text;
@@ -35,7 +35,7 @@ fn get_from_url(base_url: &Url) -> Result<Vec<Url>, String> {
 }
 
 fn get_from_body(base_url: &Url, body: &str) -> Result<Vec<Url>, url::ParseError> {
-    static ICS_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r#"href="(\S+\.ics)""#).unwrap());
+    static ICS_REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.ics)""#);
 
     let mut result: Vec<Url> = Vec::new();
     for cap in ICS_REGEX.captures_iter(body) {
