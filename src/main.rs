@@ -52,10 +52,24 @@ fn the_loop() -> anyhow::Result<()> {
 }
 
 fn part_ics() -> Vec<EventEntry> {
+    #[allow(clippy::case_sensitive_file_extension_comparisons)]
     fn one_url(url: &str) -> anyhow::Result<Vec<EventEntry>> {
-        let content = http::get_haw_text(url)?;
-        let entries = ics_to_json::parse(&content)?;
-        Ok(entries)
+        if url.ends_with(".ics") {
+            let content = http::get_haw_text(url)?;
+            let entries = ics_to_json::parse(&content)?;
+            Ok(entries)
+        } else if url.ends_with(".zip") {
+            let mut entries = Vec::new();
+            for content in http::get_ics_from_zip(url)? {
+                match ics_to_json::parse(&content) {
+                    Ok(mut v) => entries.append(&mut v),
+                    Err(err) => println!("WARNING: skip ics in zip url {url} {err}"),
+                }
+            }
+            Ok(entries)
+        } else {
+            unimplemented!("Extension not supported");
+        }
     }
 
     let urls = ics_urls::get_all();

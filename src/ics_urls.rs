@@ -7,8 +7,8 @@ use crate::http::get_text;
 pub fn get_all() -> Vec<Url> {
     static SOURCES: Lazy<[Url; 4]> = Lazy::new(|| {
         [
-            "https://userdoc.informatik.haw-hamburg.de/doku.php?id=stundenplan:ics_public",
             "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/",
+            "https://www.haw-hamburg.de/hochschule/technik-und-informatik/departments/informatik/studium/aktuelle-veranstaltungen/",
             "https://www.haw-hamburg.de/hochschule/technik-und-informatik/departments/informations-und-elektrotechnik/studium/studienorganisation/studienplaene/",
             "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
         ].map(|u| Url::parse(u).unwrap())
@@ -36,10 +36,10 @@ fn get_from_url(base_url: &Url) -> anyhow::Result<Vec<Url>> {
 }
 
 fn get_from_body(base_url: &Url, body: &str) -> Result<Vec<Url>, url::ParseError> {
-    static ICS_REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.ics)""#);
+    static REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.(?:ics|zip))""#);
 
     let mut result: Vec<Url> = Vec::new();
-    for cap in ICS_REGEX.captures_iter(body) {
+    for cap in REGEX.captures_iter(body) {
         let full_url = base_url.join(&cap[1])?;
         result.push(full_url);
     }
