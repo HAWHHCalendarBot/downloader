@@ -46,8 +46,7 @@ fn the_loop() -> anyhow::Result<()> {
     all_events.append(&mut part_ics());
     all_events.append(&mut additionals::get()?);
 
-    files::save_events(&all_events);
-
+    files::save_events(all_events);
     Ok(())
 }
 
