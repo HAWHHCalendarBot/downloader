@@ -84,22 +84,24 @@ fn get_file(path: &Path) -> anyhow::Result<Vec<EventEntry>> {
 
     let mut events: Vec<EventEntry> = Vec::with_capacity(additionals.capacity());
     for additional in additionals {
-        events.push(parse_additional_event_to_event_entry(additional)?);
+        events.push(additional.into_event_entry()?);
     }
 
     Ok(events)
 }
 
-fn parse_additional_event_to_event_entry(before: AdditionalEvent) -> anyhow::Result<EventEntry> {
-    let start = parse_datetime(before.year, before.month, before.date, &before.starttime)?;
-    let end = parse_datetime(before.year, before.month, before.date, &before.endtime)?;
-    Ok(EventEntry {
-        name: before.name,
-        location: before.room,
-        description: DESCRIPTION.to_owned(),
-        start_time: start,
-        end_time: end,
-    })
+impl AdditionalEvent {
+    fn into_event_entry(self) -> anyhow::Result<EventEntry> {
+        let start = parse_datetime(self.year, self.month, self.date, &self.starttime)?;
+        let end = parse_datetime(self.year, self.month, self.date, &self.endtime)?;
+        Ok(EventEntry {
+            name: self.name,
+            location: self.room,
+            description: DESCRIPTION.to_owned(),
+            start_time: start,
+            end_time: end,
+        })
+    }
 }
 
 fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> anyhow::Result<NaiveDateTime> {
