@@ -4,8 +4,6 @@ use std::fs;
 use std::fs::DirBuilder;
 use std::path::Path;
 
-use chrono::{DateTime, FixedOffset};
-
 use crate::EventEntry;
 
 enum HasChanged {
@@ -63,9 +61,6 @@ pub fn save_events(all: Vec<EventEntry>) {
 }
 
 fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
-    fn cmp_date(s: &str) -> DateTime<FixedOffset> {
-        DateTime::parse_from_rfc3339(s).expect("invalid datetime")
-    }
     fn ne<T: Ord>(a: &T, b: &T) -> Option<Ordering> {
         match a.cmp(b) {
             Ordering::Equal => None,
@@ -80,8 +75,8 @@ fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
 
     for groupvalues in grouped.values_mut() {
         groupvalues.sort_by(|a, b| {
-            ne(&cmp_date(&a.start_time), &cmp_date(&b.start_time))
-                .or_else(|| ne(&cmp_date(&a.end_time), &cmp_date(&b.end_time)))
+            ne(&a.start_time, &b.start_time)
+                .or_else(|| ne(&a.end_time, &b.end_time))
                 .or_else(|| ne(&a.location, &b.location))
                 .unwrap_or_else(|| a.description.cmp(&b.description))
         });

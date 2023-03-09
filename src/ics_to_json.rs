@@ -1,6 +1,5 @@
 use anyhow::anyhow;
-use chrono::{NaiveDateTime, TimeZone};
-use chrono_tz::Europe::Berlin;
+use chrono::NaiveDateTime;
 use lazy_regex::{lazy_regex, Lazy, Regex};
 
 use crate::event_entry::EventEntry;
@@ -30,15 +29,11 @@ pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
     Ok(result)
 }
 
-fn parse_datetime(raw: &str) -> anyhow::Result<String> {
+fn parse_datetime(raw: &str) -> anyhow::Result<NaiveDateTime> {
     let tless = raw.replace('T', " ");
     let naive = NaiveDateTime::parse_from_str(&tless, "%Y%m%d %H%M%S")
         .map_err(|err| anyhow!("parse_datetime {raw} {err}"))?;
-    let date_time = Berlin.from_local_datetime(&naive).unwrap();
-    // let nanos = date_time.timestamp_millis();
-    // let offset = date_time.offset().to_string().replace(":", "");
-    // let result = format!("/Date({nanos}{offset})/");
-    Ok(date_time.to_rfc3339())
+    Ok(naive)
 }
 
 fn parse_description(dozent: &str) -> String {
@@ -58,11 +53,17 @@ fn parse_location(raw: &str) -> String {
 #[test]
 fn can_parse_ics_datetime() -> anyhow::Result<()> {
     assert_eq!(
-        "2020-12-05T22:04:00+01:00",
+        chrono::NaiveDate::from_ymd_opt(2020, 12, 5)
+            .unwrap()
+            .and_hms_opt(22, 4, 0)
+            .unwrap(),
         parse_datetime("20201205T220400")?
     );
     assert_eq!(
-        "2020-07-05T12:04:00+02:00",
+        chrono::NaiveDate::from_ymd_opt(2020, 7, 5)
+            .unwrap()
+            .and_hms_opt(12, 4, 0)
+            .unwrap(),
         parse_datetime("20200705T120400")?
     );
     Ok(())

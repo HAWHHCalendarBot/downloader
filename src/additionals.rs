@@ -3,8 +3,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use anyhow::anyhow;
-use chrono::{NaiveDate, NaiveTime, TimeZone};
-use chrono_tz::Europe::Berlin;
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 
 use crate::event_entry::EventEntry;
@@ -103,21 +102,23 @@ fn parse_additional_event_to_event_entry(before: AdditionalEvent) -> anyhow::Res
     })
 }
 
-fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> anyhow::Result<String> {
+fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> anyhow::Result<NaiveDateTime> {
     let naive = NaiveDate::from_ymd_opt(i32::from(year), u32::from(month), u32::from(day))
         .ok_or_else(|| anyhow!("parse_datetime day {year} {month} {day}"))?
         .and_time(
             NaiveTime::parse_from_str(time, "%H:%M")
                 .map_err(|err| anyhow!("parse_datetime time {time} {err}"))?,
         );
-    let date_time = Berlin.from_local_datetime(&naive).unwrap();
-    Ok(date_time.to_rfc3339())
+    Ok(naive)
 }
 
 #[test]
 fn can_parse_datetime() -> anyhow::Result<()> {
     assert_eq!(
-        "2020-12-04T22:04:00+01:00",
+        chrono::NaiveDate::from_ymd_opt(2020, 12, 4)
+            .unwrap()
+            .and_hms_opt(22, 4, 0)
+            .unwrap(),
         parse_datetime(2020, 12, 4, "22:04")?
     );
     Ok(())
