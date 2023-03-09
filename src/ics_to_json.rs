@@ -18,12 +18,10 @@ pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
         let dozent = cap[3].trim();
         // let uid = &cap[4];
 
-        let description = parse_description(dozent);
-
         result.push(EventEntry {
             name: cap[1].trim().to_owned(),
             location: parse_location(cap[2].trim()),
-            description,
+            description: parse_description(dozent),
             start_time: parse_datetime(cap[5].trim())?,
             end_time: parse_datetime(cap[6].trim())?,
         });
