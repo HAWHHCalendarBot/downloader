@@ -71,7 +71,7 @@ fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
         groupvalues.sort_by_cached_key(|o| {
             DateTime::parse_from_rfc3339(&o.start_time).expect("starttime is not a valid datetime")
         });
-        groupvalues.dedup_by_key(|o| serde_json::to_string(&o).unwrap());
+        groupvalues.dedup();
     }
 
     grouped
