@@ -21,6 +21,8 @@ pub fn get_all() -> Vec<Url> {
             Err(err) => println!("WARNING: skip base url {url} {err}"),
         }
     }
+    result.sort();
+    result.dedup();
     result
 }
 
