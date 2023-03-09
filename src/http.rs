@@ -1,5 +1,6 @@
 use std::io::Read;
 
+use anyhow::anyhow;
 use encoding::all::ISO_8859_1;
 use encoding::{DecoderTrap, Encoding};
 use once_cell::sync::Lazy;
@@ -22,25 +23,22 @@ fn get_with_headers(url: &str) -> Request {
         .set("from", "calendarbot-downloader@hawhh.de")
 }
 
-pub fn get_text(url: &str) -> Result<String, String> {
-    get_with_headers(url)
-        .call()
-        .map_err(|err| format!("failed to get {err}"))?
-        .into_string()
-        .map_err(|err| format!("failed to read string {url} {err}"))
+pub fn get_text(url: &str) -> anyhow::Result<String> {
+    let content = get_with_headers(url).call()?.into_string()?;
+    Ok(content)
 }
 
-pub fn get_haw_text(url: &str) -> Result<String, String> {
+pub fn get_haw_text(url: &str) -> anyhow::Result<String> {
     let mut bytes: Vec<u8> = vec![];
 
     get_with_headers(url)
-        .call()
-        .map_err(|err| format!("failed to get {err}"))?
+        .call()?
         .into_reader()
         .read_to_end(&mut bytes)
-        .map_err(|err| format!("failed to read bytes {url} {err}"))?;
+        .map_err(|err| anyhow!("read bytes from body {url} {err}"))?;
 
-    ISO_8859_1
+    let content = ISO_8859_1
         .decode(&bytes, DecoderTrap::Replace)
-        .map_err(|err| format!("failed to parse encoding {url} {err}"))
+        .expect("Decoder Trap cant fail");
+    Ok(content)
 }

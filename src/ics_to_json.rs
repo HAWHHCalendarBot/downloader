@@ -1,10 +1,11 @@
+use anyhow::anyhow;
 use chrono::{NaiveDateTime, TimeZone};
 use chrono_tz::Europe::Berlin;
 use lazy_regex::{lazy_regex, Lazy, Regex};
 
 use crate::event_entry::EventEntry;
 
-pub fn parse(ics_body: &str) -> Result<Vec<EventEntry>, String> {
+pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
     static EVENT_REGEX: Lazy<Regex> = lazy_regex!(
         r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#
     );
@@ -31,10 +32,10 @@ pub fn parse(ics_body: &str) -> Result<Vec<EventEntry>, String> {
     Ok(result)
 }
 
-fn parse_datetime(raw: &str) -> Result<String, String> {
+fn parse_datetime(raw: &str) -> anyhow::Result<String> {
     let tless = raw.replace('T', " ");
     let naive = NaiveDateTime::parse_from_str(&tless, "%Y%m%d %H%M%S")
-        .map_err(|err| format!("parse_datetime failed {raw} {err}"))?;
+        .map_err(|err| anyhow!("parse_datetime {raw} {err}"))?;
     let date_time = Berlin.from_local_datetime(&naive).unwrap();
     // let nanos = date_time.timestamp_millis();
     // let offset = date_time.offset().to_string().replace(":", "");
@@ -57,7 +58,7 @@ fn parse_location(raw: &str) -> String {
 }
 
 #[test]
-fn can_parse_ics_datetime() -> Result<(), String> {
+fn can_parse_ics_datetime() -> anyhow::Result<()> {
     assert_eq!(
         "2020-12-05T22:04:00+01:00",
         parse_datetime("20201205T220400")?

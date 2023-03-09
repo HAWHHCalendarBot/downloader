@@ -17,7 +17,7 @@ const SLEEP_DURATION: Duration = Duration::from_secs(100 * 60); // 100 minutes
 const WAIT_BETWEEEN_REQUESTS: Duration = Duration::from_millis(200); // 200 milliseconds
 
 fn main() {
-    files::ensure_folders_exist().expect("failed to create folders");
+    files::ensure_folders_exist().expect("create folders");
 
     let mut error_count = 0;
 
@@ -40,7 +40,7 @@ fn main() {
     }
 }
 
-fn the_loop() -> Result<(), String> {
+fn the_loop() -> anyhow::Result<()> {
     let mut all_events: Vec<EventEntry> = Vec::new();
 
     all_events.append(&mut part_ics());
@@ -52,7 +52,7 @@ fn the_loop() -> Result<(), String> {
 }
 
 fn part_ics() -> Vec<EventEntry> {
-    fn one_url(url: &str) -> Result<Vec<EventEntry>, String> {
+    fn one_url(url: &str) -> anyhow::Result<Vec<EventEntry>> {
         let content = http::get_haw_text(url)?;
         let entries = ics_to_json::parse(&content)?;
         Ok(entries)

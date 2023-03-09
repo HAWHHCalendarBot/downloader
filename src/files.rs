@@ -1,7 +1,7 @@
 use std::collections::HashMap;
+use std::fs;
 use std::fs::DirBuilder;
 use std::path::Path;
-use std::{fs, io};
 
 use chrono::DateTime;
 use itertools::Itertools;
@@ -15,7 +15,7 @@ enum HasChanged {
 
 const FOLDER: &str = "eventfiles";
 
-pub fn ensure_folders_exist() -> Result<(), io::Error> {
+pub fn ensure_folders_exist() -> std::io::Result<()> {
     let mut dir = DirBuilder::new();
     dir.recursive(true).create(FOLDER)
 }
@@ -42,13 +42,13 @@ pub fn save_events(all: &[EventEntry]) {
     all_events.sort();
 
     let all_txt_content = all_events.join("\n") + "\n";
-    write_when_different("all.txt", &all_txt_content).expect("failed to write all.txt");
+    write_when_different("all.txt", &all_txt_content).expect("write all.txt");
 
     for existing_file in read_existing_eventfiles().unwrap() {
         if !expected_files.contains(&existing_file) {
             let filename = format!("{existing_file}.json");
             let path = Path::new(FOLDER).join(filename);
-            fs::remove_file(path).expect("failed removing superflous event file");
+            fs::remove_file(path).expect("removing superflous event file");
             removed_events.push(existing_file);
         }
     }
@@ -93,12 +93,11 @@ fn get_grouped(all: &[EventEntry]) -> HashMap<String, Vec<EventEntry>> {
 
 fn save_events_to_file(name: &str, events: &[EventEntry]) -> HasChanged {
     let filename = format!("{}.json", name.replace('/', "-"));
-    let json =
-        serde_json::to_string_pretty(&events).expect("could not serialize the events to json");
-    write_when_different(&filename, &json).expect("failed to write file")
+    let json = serde_json::to_string_pretty(&events).expect("serialize events to json");
+    write_when_different(&filename, &json).expect("write event file")
 }
 
-fn write_when_different(filename: &str, content: &str) -> Result<HasChanged, io::Error> {
+fn write_when_different(filename: &str, content: &str) -> std::io::Result<HasChanged> {
     let path = Path::new(FOLDER).join(filename);
     if let Ok(current) = fs::read_to_string(&path) {
         if current == content {
@@ -111,7 +110,7 @@ fn write_when_different(filename: &str, content: &str) -> Result<HasChanged, io:
     Ok(HasChanged::Changed)
 }
 
-fn read_existing_eventfiles() -> Result<Vec<String>, io::Error> {
+fn read_existing_eventfiles() -> std::io::Result<Vec<String>> {
     let mut list: Vec<String> = Vec::new();
     for maybe_entry in fs::read_dir(FOLDER)? {
         let path = maybe_entry?.path();

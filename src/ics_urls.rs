@@ -24,10 +24,9 @@ pub fn get_all() -> Vec<Url> {
     result
 }
 
-fn get_from_url(base_url: &Url) -> Result<Vec<Url>, String> {
+fn get_from_url(base_url: &Url) -> anyhow::Result<Vec<Url>> {
     let body = get_text(base_url.as_str())?;
-    let urls =
-        get_from_body(base_url, &body).map_err(|err| format!("parsing urls failed {err}"))?;
+    let urls = get_from_body(base_url, &body)?;
     if urls.is_empty() {
         println!("WARNING: no ics urls from url {base_url}");
     }
