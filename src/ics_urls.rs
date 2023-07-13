@@ -15,7 +15,7 @@ pub fn get_all() -> Vec<Url> {
     });
 
     let mut result: Vec<Url> = Vec::new();
-    for url in SOURCES.iter() {
+    for url in &*SOURCES {
         match get_from_url(url) {
             Ok(mut urls) => result.append(&mut urls),
             Err(err) => println!("WARNING: skip base url {url} {err}"),
