@@ -24,7 +24,7 @@ fn main() {
     loop {
         println!("Its time for another download... Start!");
         match the_loop() {
-            Ok(_) => {
+            Ok(()) => {
                 error_count = 0;
                 println!("download successful");
             }
