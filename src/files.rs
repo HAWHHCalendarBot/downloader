@@ -113,7 +113,7 @@ fn read_existing_eventfiles() -> std::io::Result<Vec<String>> {
                 .map_or(false, |ext| ext.eq_ignore_ascii_case("json"));
         if is_json {
             if let Some(name) = path.file_stem().and_then(std::ffi::OsStr::to_str) {
-                list.push(name.to_string());
+                list.push(name.to_owned());
             }
         }
     }

@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use chrono::NaiveDateTime;
-use lazy_regex::{lazy_regex, Lazy, Regex};
+use lazy_regex::{lazy_regex, regex, Lazy, Regex};
 
 use crate::event_entry::EventEntry;
 
@@ -45,9 +45,10 @@ fn parse_description(dozent: &str) -> String {
 }
 
 fn parse_location(raw: &str) -> String {
-    static LOCATION_REGEX: Lazy<Regex> = lazy_regex!(r#"Stand \d{2}-\d{2}-\d{4}"#);
-
-    LOCATION_REGEX.replace_all(raw, "").trim().to_string()
+    regex!(r"Stand \d{2}-\d{2}-\d{4}")
+        .replace_all(raw, "")
+        .trim()
+        .to_owned()
 }
 
 #[test]
