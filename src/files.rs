@@ -86,10 +86,8 @@ fn save_events_to_file(name: &str, events: &[EventEntry]) -> HasChanged {
 
 fn write_when_different(filename: &str, content: &str) -> std::io::Result<HasChanged> {
     let path = Path::new(FOLDER).join(filename);
-    if let Ok(current) = fs::read_to_string(&path) {
-        if current == content {
-            return Ok(HasChanged::Unchanged);
-        }
+    if fs::read_to_string(&path).is_ok_and(|current| current == content) {
+        return Ok(HasChanged::Unchanged);
     }
     fs::write(&path, content)?;
     Ok(HasChanged::Changed)
