@@ -40,21 +40,12 @@ pub fn save_events(all: Vec<EventEntry>) {
     drop(all_events);
     write_when_different("all.txt", &all_txt_content).expect("write all.txt");
 
-    let mut removed_events = Vec::new();
-    for existing_file in read_existing_eventfiles().unwrap() {
-        if !expected_files.contains(&existing_file) {
-            let filename = format!("{existing_file}.json");
-            let path = Path::new(FOLDER).join(filename);
-            fs::remove_file(path).expect("removing superflous event file");
-            removed_events.push(existing_file);
-        }
-    }
-
     if !changed_events.is_empty() {
         changed_events.sort();
         println!("changed {} {changed_events:?}", changed_events.len());
     }
 
+    let mut removed_events = cleanup_superfluous_eventfiles(&expected_files);
     if !removed_events.is_empty() {
         removed_events.sort();
         println!("deleted {} {removed_events:?}", removed_events.len());
@@ -104,19 +95,30 @@ fn write_when_different(filename: &str, content: &str) -> std::io::Result<HasCha
     Ok(HasChanged::Changed)
 }
 
-fn read_existing_eventfiles() -> std::io::Result<Vec<String>> {
-    let mut list = Vec::new();
-    for maybe_entry in fs::read_dir(FOLDER)? {
-        let path = maybe_entry?.path();
+fn cleanup_superfluous_eventfiles(expected_files: &[String]) -> Vec<String> {
+    let mut removed = Vec::new();
+    for maybe_entry in fs::read_dir(FOLDER).expect("should be able to read event file directory") {
+        let path = maybe_entry
+            .expect("should be able to inspect event file")
+            .path();
         let is_json = path.is_file()
             && path
                 .extension()
                 .map_or(false, |ext| ext.eq_ignore_ascii_case("json"));
-        if is_json {
-            if let Some(name) = path.file_stem().and_then(std::ffi::OsStr::to_str) {
-                list.push(name.to_owned());
-            }
+        if !is_json {
+            continue;
         }
+        let Some(name) = path.file_stem().and_then(std::ffi::OsStr::to_str) else {
+            eprintln!("WARNING: deleting non UTF8 named json file {path:?}");
+            fs::remove_file(&path).expect("should be able to remove superfluous event file");
+            continue;
+        };
+        let name = name.to_owned();
+        if expected_files.contains(&name) {
+            continue;
+        }
+        fs::remove_file(&path).expect("should be able to remove superfluous event file");
+        removed.push(name);
     }
-    Ok(list)
+    removed
 }
