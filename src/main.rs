@@ -41,7 +41,7 @@ fn main() {
 }
 
 fn the_loop() -> anyhow::Result<()> {
-    let mut all_events: Vec<EventEntry> = Vec::new();
+    let mut all_events = Vec::new();
 
     all_events.append(&mut part_ics());
     all_events.append(&mut additionals::get()?);

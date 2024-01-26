@@ -27,7 +27,7 @@ pub fn get() -> anyhow::Result<Vec<EventEntry>> {
     let files = get_file_list().map_err(|err| anyhow!("read additional event directory {err}"))?;
     println!("Additionals: found {} event files", files.len());
 
-    let mut events: Vec<EventEntry> = Vec::new();
+    let mut events = Vec::new();
     for file in files {
         let mut file_events = get_file(&file)
             .map_err(|err| anyhow!("Additionals file {:?} {err}", file.file_name()))?;
@@ -63,7 +63,7 @@ fn pull() -> anyhow::Result<()> {
 }
 
 fn get_file_list() -> std::io::Result<Vec<PathBuf>> {
-    let mut list: Vec<PathBuf> = Vec::new();
+    let mut list = Vec::new();
     for maybe_entry in fs::read_dir("additionalEventsGithub/events")? {
         let path = maybe_entry?.path();
         let is_json = path.is_file()
@@ -74,19 +74,16 @@ fn get_file_list() -> std::io::Result<Vec<PathBuf>> {
             list.push(path);
         }
     }
-
     Ok(list)
 }
 
 fn get_file(path: &Path) -> anyhow::Result<Vec<EventEntry>> {
     let content = fs::read_to_string(path)?;
     let additionals: Vec<AdditionalEvent> = serde_json::from_str(&content)?;
-
-    let mut events: Vec<EventEntry> = Vec::with_capacity(additionals.capacity());
+    let mut events = Vec::with_capacity(additionals.len());
     for additional in additionals {
         events.push(additional.into_event_entry()?);
     }
-
     Ok(events)
 }
 

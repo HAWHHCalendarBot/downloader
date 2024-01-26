@@ -9,7 +9,7 @@ pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
         r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#
     );
 
-    let mut result: Vec<EventEntry> = Vec::new();
+    let mut result = Vec::new();
 
     let sane_body = ics_body.replace("\r\n", "\n");
 

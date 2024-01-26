@@ -14,7 +14,7 @@ pub fn get_all() -> Vec<Url> {
         ].map(|u| Url::parse(u).unwrap())
     });
 
-    let mut result: Vec<Url> = Vec::new();
+    let mut result = Vec::new();
     for url in &*SOURCES {
         match get_from_url(url) {
             Ok(mut urls) => result.append(&mut urls),
@@ -38,7 +38,7 @@ fn get_from_url(base_url: &Url) -> anyhow::Result<Vec<Url>> {
 fn get_from_body(base_url: &Url, body: &str) -> Result<Vec<Url>, url::ParseError> {
     static REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.(?:ics|zip))""#);
 
-    let mut result: Vec<Url> = Vec::new();
+    let mut result = Vec::new();
     for cap in REGEX.captures_iter(body) {
         let full_url = base_url.join(&cap[1])?;
         result.push(full_url);

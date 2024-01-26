@@ -19,13 +19,13 @@ pub fn ensure_folders_exist() -> std::io::Result<()> {
 }
 
 pub fn save_events(all: Vec<EventEntry>) {
-    let mut all_events: Vec<String> = Vec::new();
-    let mut expected_files: Vec<String> = Vec::new();
-    let mut changed_events: Vec<String> = Vec::new();
-    let mut removed_events: Vec<String> = Vec::new();
-
     let grouped = get_grouped(all);
     println!("Events by name: {}", grouped.len());
+
+    let mut all_events = Vec::with_capacity(grouped.len());
+    let mut expected_files = Vec::with_capacity(grouped.len());
+    let mut changed_events = Vec::new();
+
     for (key, events) in grouped {
         let has_changed = save_events_to_file(&key, &events);
         if matches!(has_changed, HasChanged::Changed) {
@@ -36,10 +36,11 @@ pub fn save_events(all: Vec<EventEntry>) {
     }
 
     all_events.sort();
-
     let all_txt_content = all_events.join("\n") + "\n";
+    drop(all_events);
     write_when_different("all.txt", &all_txt_content).expect("write all.txt");
 
+    let mut removed_events = Vec::new();
     for existing_file in read_existing_eventfiles().unwrap() {
         if !expected_files.contains(&existing_file) {
             let filename = format!("{existing_file}.json");
@@ -104,7 +105,7 @@ fn write_when_different(filename: &str, content: &str) -> std::io::Result<HasCha
 }
 
 fn read_existing_eventfiles() -> std::io::Result<Vec<String>> {
-    let mut list: Vec<String> = Vec::new();
+    let mut list = Vec::new();
     for maybe_entry in fs::read_dir(FOLDER)? {
         let path = maybe_entry?.path();
         let is_json = path.is_file()
