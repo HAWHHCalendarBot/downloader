@@ -3,6 +3,7 @@ name: Test and Build Rust
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 env:
   RUSTFLAGS: --deny warnings
@@ -113,7 +114,7 @@ jobs:
         if: runner.os != 'Windows'
         run: >
           tar -cv
-          LICENSE README.md
+          CHANGELOG.md LICENSE README.md
           -C target/${{ matrix.triple }}/release/ hawhh-calendarbot-downloader
           | gzip --best > ${{ env.ARTIFACT_NAME }}.tar.gz
 
