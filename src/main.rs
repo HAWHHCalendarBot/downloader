@@ -61,7 +61,7 @@ fn part_ics() -> Vec<EventEntry> {
             let mut entries = Vec::new();
             for content in http::get_ics_from_zip(url)? {
                 match ics_to_json::parse(&content) {
-                    Ok(mut v) => entries.append(&mut v),
+                    Ok(mut vec) => entries.append(&mut vec),
                     Err(err) => println!("WARNING: skip ics in zip url {url} {err}"),
                 }
             }

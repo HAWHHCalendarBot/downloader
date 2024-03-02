@@ -52,6 +52,7 @@ pub fn save_events(all: Vec<EventEntry>) {
     }
 }
 
+#[allow(clippy::min_ident_chars)]
 fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
     fn ne<T: Ord>(a: &T, b: &T) -> Option<Ordering> {
         match a.cmp(b) {

@@ -11,7 +11,7 @@ pub fn get_all() -> Vec<Url> {
             "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/",
             "https://www.haw-hamburg.de/hochschule/technik-und-informatik/departments/informations-und-elektrotechnik/studium/studienorganisation/studienplaene/",
             "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
-        ].map(|u| Url::parse(u).unwrap())
+        ].map(|url| Url::parse(url).unwrap())
     });
 
     let mut result = Vec::new();

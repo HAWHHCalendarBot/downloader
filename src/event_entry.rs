@@ -14,9 +14,9 @@ pub struct EventEntry {
     pub end_time: NaiveDateTime,
 }
 
-fn serialize_date_time<S>(dt: &NaiveDateTime, s: S) -> Result<S::Ok, S::Error>
+fn serialize_date_time<S>(dt: &NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error>
 where
     S: serde::Serializer,
 {
-    s.serialize_str(&Berlin.from_local_datetime(dt).unwrap().to_rfc3339())
+    serializer.serialize_str(&Berlin.from_local_datetime(dt).unwrap().to_rfc3339())
 }
