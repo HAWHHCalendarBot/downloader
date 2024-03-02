@@ -1,7 +1,7 @@
 [package]
 name = "hawhh-calendarbot-downloader"
 description = "This tool downloads ICS Files and parses them into a generic JSON known to this project"
-version = "3.3.0"
+version = "3.3.1"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/HAWHHCalendarBot/downloader"
 authors = ["EdJoPaTo <calendarbot-downloader@edjopato.de>"]
