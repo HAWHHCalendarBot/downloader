@@ -6,7 +6,6 @@ license = "AGPL-3.0-or-later"
 repository = "https://github.com/HAWHHCalendarBot/downloader"
 authors = ["EdJoPaTo <calendarbot-downloader@edjopato.de>"]
 edition = "2021"
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lints.rust]
 unsafe_code = "forbid"
@@ -15,10 +14,8 @@ pedantic = "warn"
 nursery = "warn"
 
 [profile.release]
-# See https://doc.rust-lang.org/cargo/reference/profiles.html
 codegen-units = 1
 lto = true
-strip = "debuginfo"
 
 [dependencies]
 anyhow = "1"
