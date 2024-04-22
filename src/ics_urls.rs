@@ -36,7 +36,7 @@ fn get_from_url(base_url: &Url) -> anyhow::Result<Vec<Url>> {
 }
 
 fn get_from_body(base_url: &Url, body: &str) -> Result<Vec<Url>, url::ParseError> {
-    static REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.(?:ics|zip))""#);
+    static REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.ics)""#);
 
     let mut result = Vec::new();
     for cap in REGEX.captures_iter(body) {

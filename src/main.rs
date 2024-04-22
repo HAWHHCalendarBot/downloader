@@ -55,15 +55,6 @@ fn part_ics() -> Vec<EventEntry> {
             let content = http::get_haw_text(url)?;
             let entries = ics_to_json::parse(&content)?;
             Ok(entries)
-        } else if url.ends_with(".zip") {
-            let mut entries = Vec::new();
-            for content in http::get_ics_from_zip(url)? {
-                match ics_to_json::parse(&content) {
-                    Ok(mut vec) => entries.append(&mut vec),
-                    Err(err) => println!("WARNING: skip ics in zip url {url} {err}"),
-                }
-            }
-            Ok(entries)
         } else {
             unimplemented!("Extension not supported");
         }
