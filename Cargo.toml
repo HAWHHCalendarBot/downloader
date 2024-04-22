@@ -1,7 +1,7 @@
 [package]
 name = "hawhh-calendarbot-downloader"
 description = "This tool downloads ICS Files and parses them into a generic JSON known to this project"
-version = "3.3.1"
+version = "4.0.0"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/HAWHHCalendarBot/downloader"
 authors = ["EdJoPaTo <calendarbot-downloader@edjopato.de>"]
@@ -20,7 +20,7 @@ lto = true
 [dependencies]
 anyhow = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
-chrono-tz = "0.8"
+chrono-tz = "0.9"
 encoding = "0.2"
 lazy-regex = "3"
 once_cell = "1"
