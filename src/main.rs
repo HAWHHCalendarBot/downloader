@@ -1,5 +1,3 @@
-#![forbid(unsafe_code)]
-
 use std::thread::sleep;
 use std::time::Duration;
 
