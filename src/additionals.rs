@@ -52,7 +52,7 @@ fn pull() -> anyhow::Result<()> {
                 "-q",
                 "--depth",
                 "1",
-                "https://github.com/HAWHHCalendarBot/AdditionalEvents",
+                "https://github.com/HAWHHCalendarBot/AdditionalEvents.git",
                 "additionalEventsGithub",
             ])
             .status()
