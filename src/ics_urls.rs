@@ -1,11 +1,12 @@
-use lazy_regex::{lazy_regex, Regex};
-use once_cell::sync::Lazy;
+use std::sync::LazyLock;
+
+use lazy_regex::regex;
 use url::Url;
 
 use crate::http::get_text;
 
 pub fn get_all() -> Vec<Url> {
-    static SOURCES: Lazy<[Url; 4]> = Lazy::new(|| {
+    static SOURCES: LazyLock<[Url; 4]> = LazyLock::new(|| {
         [
             "https://userdoc.informatik.haw-hamburg.de/doku.php?id=stundenplan:ics_public",
             "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/",
@@ -36,10 +37,8 @@ fn get_from_url(base_url: &Url) -> anyhow::Result<Vec<Url>> {
 }
 
 fn get_from_body(base_url: &Url, body: &str) -> Result<Vec<Url>, url::ParseError> {
-    static REGEX: Lazy<Regex> = lazy_regex!(r#"href="(\S+\.ics)""#);
-
     let mut result = Vec::new();
-    for cap in REGEX.captures_iter(body) {
+    for cap in regex!(r#"href="(\S+\.ics)""#).captures_iter(body) {
         let full_url = base_url.join(&cap[1])?;
         result.push(full_url);
     }

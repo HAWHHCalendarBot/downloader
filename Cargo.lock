@@ -220,7 +220,6 @@ dependencies = [
  "chrono-tz",
  "encoding",
  "lazy-regex",
- "once_cell",
  "serde",
  "serde_json",
  "ureq",

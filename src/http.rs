@@ -1,9 +1,9 @@
 use std::io::Read;
+use std::sync::LazyLock;
 
 use anyhow::anyhow;
 use encoding::all::ISO_8859_1;
 use encoding::{DecoderTrap, Encoding};
-use once_cell::sync::Lazy;
 use ureq::{Agent, Request};
 
 const USER_AGENT: &str = concat!(
@@ -15,8 +15,8 @@ const USER_AGENT: &str = concat!(
 );
 
 fn get_with_headers(url: &str) -> Request {
-    static AGENT: Lazy<Agent> =
-        Lazy::new(|| ureq::AgentBuilder::new().user_agent(USER_AGENT).build());
+    static AGENT: LazyLock<Agent> =
+        LazyLock::new(|| ureq::AgentBuilder::new().user_agent(USER_AGENT).build());
 
     AGENT
         .get(url)

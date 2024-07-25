@@ -1,11 +1,11 @@
 use anyhow::anyhow;
 use chrono::NaiveDateTime;
-use lazy_regex::{lazy_regex, regex, Lazy, Regex};
+use lazy_regex::regex;
 
 use crate::event_entry::EventEntry;
 
 pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
-    static EVENT_REGEX: Lazy<Regex> = lazy_regex!(
+    let event_regex = regex!(
         r#"BEGIN:VEVENT\nSUMMARY:(.+)\nLOCATION:(.+)\n(?:DESCRIPTION:(.*)\n)?UID:(.+)\nDTSTART;TZID=Europe/Berlin:(.+)\nDTEND;TZID=Europe/Berlin:(.+)\nEND:VEVENT"#
     );
 
@@ -13,7 +13,7 @@ pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
 
     let sane_body = ics_body.replace("\r\n", "\n");
 
-    for cap in EVENT_REGEX.captures_iter(&sane_body) {
+    for cap in event_regex.captures_iter(&sane_body) {
         let dozent = cap[3].trim();
         // let uid = &cap[4];
 
