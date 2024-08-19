@@ -114,7 +114,7 @@ fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> anyhow::Result<N
 #[test]
 fn can_parse_datetime() -> anyhow::Result<()> {
     assert_eq!(
-        chrono::NaiveDate::from_ymd_opt(2020, 12, 4)
+        NaiveDate::from_ymd_opt(2020, 12, 4)
             .unwrap()
             .and_hms_opt(22, 4, 0)
             .unwrap(),
