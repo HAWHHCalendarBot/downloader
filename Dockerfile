@@ -30,5 +30,5 @@ WORKDIR /app
 VOLUME /app/eventfiles
 VOLUME /app/additionalEventsGithub
 
-COPY --from=builder /build/target/release/hawhh-calendarbot-downloader /usr/bin/
+COPY --from=builder /build/target/release/hawhh-calendarbot-downloader /usr/local/bin/
 ENTRYPOINT ["hawhh-calendarbot-downloader"]
