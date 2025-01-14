@@ -2,7 +2,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
-use anyhow::anyhow;
+use anyhow::Context as _;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use serde::{Deserialize, Serialize};
 
@@ -24,13 +24,13 @@ const DESCRIPTION: &str = "Dies ist eine zusätzliche, inoffizielle Veranstaltun
 pub fn get() -> anyhow::Result<Vec<EventEntry>> {
     pull()?;
 
-    let files = get_file_list().map_err(|err| anyhow!("read additional event directory {err}"))?;
+    let files = get_file_list().context("read additional event directory")?;
     println!("Additionals: found {} event files", files.len());
 
     let mut events = Vec::new();
     for file in files {
-        let mut file_events = get_file(&file)
-            .map_err(|err| anyhow!("Additionals file {:?} {err}", file.file_name()))?;
+        let mut file_events =
+            get_file(&file).with_context(|| format!("Additionals file {:?}", file.file_name()))?;
         events.append(&mut file_events);
     }
     println!("Additional events: {}", events.len());
@@ -44,7 +44,7 @@ fn pull() -> anyhow::Result<()> {
             .arg("--ff-only")
             .current_dir("additionalEventsGithub")
             .status()
-            .map_err(|err| anyhow!("pull additional event repo {err}"))?
+            .context("pull additional event repo")?
     } else {
         Command::new("git")
             .args([
@@ -56,7 +56,7 @@ fn pull() -> anyhow::Result<()> {
                 "additionalEventsGithub",
             ])
             .status()
-            .map_err(|err| anyhow!("clone additional event repo {err}"))?
+            .context("clone additional event repo")?
     };
     anyhow::ensure!(status.success(), "clone/pull. Status code {status}");
     Ok(())
@@ -103,10 +103,10 @@ impl AdditionalEvent {
 
 fn parse_datetime(year: u16, month: u8, day: u8, time: &str) -> anyhow::Result<NaiveDateTime> {
     let naive = NaiveDate::from_ymd_opt(i32::from(year), u32::from(month), u32::from(day))
-        .ok_or_else(|| anyhow!("parse_datetime day {year} {month} {day}"))?
+        .with_context(|| format!("parse_datetime day {year} {month} {day}"))?
         .and_time(
             NaiveTime::parse_from_str(time, "%H:%M")
-                .map_err(|err| anyhow!("parse_datetime time {time} {err}"))?,
+                .with_context(|| format!("parse_datetime time {time}"))?,
         );
     Ok(naive)
 }

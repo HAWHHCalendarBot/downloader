@@ -27,7 +27,7 @@ fn main() {
                 println!("download successful");
             }
             Err(err) => {
-                println!("download failed... {err}");
+                println!("download failed... {err:#}");
                 error_count += 1;
                 assert!(error_count <= 3, "too many download errors");
             }
@@ -76,7 +76,7 @@ fn part_ics() -> Vec<EventEntry> {
                 entries.append(&mut one);
                 successful += 1;
             }
-            Err(err) => println!("WARNING: skip ics file url {url} {err}"),
+            Err(err) => println!("WARNING: skip ics file url {url} {err:#}"),
         }
 
         #[cfg(debug_assertions)]

@@ -1,4 +1,4 @@
-use anyhow::anyhow;
+use anyhow::Context as _;
 use chrono::NaiveDateTime;
 use lazy_regex::regex;
 
@@ -32,7 +32,7 @@ pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
 fn parse_datetime(raw: &str) -> anyhow::Result<NaiveDateTime> {
     let tless = raw.replace('T', " ");
     let naive = NaiveDateTime::parse_from_str(&tless, "%Y%m%d %H%M%S")
-        .map_err(|err| anyhow!("parse_datetime {raw} {err}"))?;
+        .with_context(|| format!("parse_datetime {raw}"))?;
     Ok(naive)
 }
 

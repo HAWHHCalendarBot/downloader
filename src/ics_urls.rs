@@ -19,7 +19,7 @@ pub fn get_all() -> Vec<Url> {
     for url in &*SOURCES {
         match get_from_url(url) {
             Ok(mut urls) => result.append(&mut urls),
-            Err(err) => println!("WARNING: skip base url {url} {err}"),
+            Err(err) => println!("WARNING: skip base url {url} {err:#}"),
         }
     }
     result.sort();

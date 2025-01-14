@@ -1,7 +1,7 @@
 use std::io::Read as _;
 use std::sync::LazyLock;
 
-use anyhow::anyhow;
+use anyhow::Context as _;
 use encoding::all::ISO_8859_1;
 use encoding::{DecoderTrap, Encoding as _};
 use ureq::{Agent, Request};
@@ -34,7 +34,7 @@ pub fn get_haw_text(url: &str) -> anyhow::Result<String> {
         .call()?
         .into_reader()
         .read_to_end(&mut bytes)
-        .map_err(|err| anyhow!("read bytes from body {url} {err}"))?;
+        .with_context(|| format!("read bytes from body {url}"))?;
     Ok(decode_haw_text(&bytes))
 }
 
