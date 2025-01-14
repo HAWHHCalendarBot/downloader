@@ -2,6 +2,7 @@
 *.md
 /target
 Dockerfile
+rustfmt.toml
 
 /additionalEventsGithub
 /eventfiles
