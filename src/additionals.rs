@@ -69,7 +69,7 @@ fn get_file_list() -> std::io::Result<Vec<PathBuf>> {
         let is_json = path.is_file()
             && path
                 .extension()
-                .map_or(false, |ext| ext.eq_ignore_ascii_case("json"));
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("json"));
         if is_json {
             list.push(path);
         }

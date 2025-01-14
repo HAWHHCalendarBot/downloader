@@ -103,7 +103,7 @@ fn cleanup_superfluous_eventfiles(expected_files: &[String]) -> Vec<String> {
         let is_json = path.is_file()
             && path
                 .extension()
-                .map_or(false, |ext| ext.eq_ignore_ascii_case("json"));
+                .is_some_and(|ext| ext.eq_ignore_ascii_case("json"));
         if !is_json {
             continue;
         }
