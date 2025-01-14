@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:1-bookworm as builder
+FROM docker.io/library/rust:1-bookworm AS builder
 WORKDIR /build
 RUN apt-get update \
 	&& apt-get upgrade -y \
@@ -19,7 +19,7 @@ RUN cargo build --release --frozen --offline
 
 
 # Start building the final image
-FROM docker.io/library/debian:bookworm-slim
+FROM docker.io/library/debian:bookworm-slim AS final
 RUN apt-get update \
 	&& apt-get upgrade -y \
 	&& apt-get install -y git \
