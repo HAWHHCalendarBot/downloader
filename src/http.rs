@@ -1,9 +1,9 @@
-use std::io::Read;
+use std::io::Read as _;
 use std::sync::LazyLock;
 
 use anyhow::anyhow;
 use encoding::all::ISO_8859_1;
-use encoding::{DecoderTrap, Encoding};
+use encoding::{DecoderTrap, Encoding as _};
 use ureq::{Agent, Request};
 
 const USER_AGENT: &str = concat!(

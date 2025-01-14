@@ -1,4 +1,4 @@
-use chrono::{NaiveDateTime, TimeZone};
+use chrono::{NaiveDateTime, TimeZone as _};
 use chrono_tz::Europe::Berlin;
 use serde::Serialize;
 
