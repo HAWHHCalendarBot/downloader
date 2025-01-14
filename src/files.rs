@@ -31,8 +31,8 @@ pub fn save_events(all: Vec<EventEntry>) {
         if matches!(has_changed, HasChanged::Changed) {
             changed_events.push(key.clone());
         }
-        expected_files.push(key.replace('/', "-"));
-        all_events.push(key);
+        expected_files.push(key);
+        all_events.push(events.first().unwrap().name.clone());
     }
 
     all_events.sort();
@@ -53,6 +53,7 @@ pub fn save_events(all: Vec<EventEntry>) {
 }
 
 #[allow(clippy::min_ident_chars)]
+/// Groups the events by their file name
 fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
     fn ne<T: Ord>(a: &T, b: &T) -> Option<Ordering> {
         match a.cmp(b) {
@@ -63,7 +64,8 @@ fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
 
     let mut grouped: HashMap<String, Vec<EventEntry>> = HashMap::new();
     for entry in all {
-        grouped.entry(entry.name.clone()).or_default().push(entry);
+        let filename = entry.name.replace('/', "-");
+        grouped.entry(filename).or_default().push(entry);
     }
 
     for groupvalues in grouped.values_mut() {
@@ -71,7 +73,8 @@ fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
             ne(&a.start_time, &b.start_time)
                 .or_else(|| ne(&a.end_time, &b.end_time))
                 .or_else(|| ne(&a.location, &b.location))
-                .unwrap_or_else(|| a.description.cmp(&b.description))
+                .or_else(|| ne(&a.description, &b.description))
+                .unwrap_or_else(|| a.name.cmp(&b.name))
         });
         groupvalues.dedup();
     }
@@ -80,7 +83,7 @@ fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
 }
 
 fn save_events_to_file(name: &str, events: &[EventEntry]) -> HasChanged {
-    let filename = format!("{}.json", name.replace('/', "-"));
+    let filename = format!("{name}.json");
     let json = serde_json::to_string_pretty(events).expect("serialize events to json");
     write_when_different(&filename, &json).expect("write event file")
 }
