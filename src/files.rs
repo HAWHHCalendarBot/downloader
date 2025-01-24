@@ -1,7 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::fs;
-use std::fs::DirBuilder;
 use std::path::Path;
 
 use crate::EventEntry;
@@ -14,8 +13,7 @@ enum HasChanged {
 const FOLDER: &str = "eventfiles";
 
 pub fn ensure_folders_exist() -> std::io::Result<()> {
-    let mut dir = DirBuilder::new();
-    dir.recursive(true).create(FOLDER)
+    fs::create_dir_all(FOLDER)
 }
 
 pub fn save_events(all: Vec<EventEntry>) {
