@@ -27,12 +27,17 @@ pub fn get_text(url: &str) -> anyhow::Result<String> {
 }
 
 pub fn get_haw_text(url: &str) -> anyhow::Result<String> {
+    const LIMIT: usize = 250_000;
+
     let mut bytes: Vec<u8> = vec![];
     get_with_headers(url)
         .call()?
         .into_reader()
+        .take((LIMIT + 1) as u64)
         .read_to_end(&mut bytes)
-        .with_context(|| format!("read bytes from body {url}"))?;
+        .context("read bytes from body")?;
+
+    anyhow::ensure!(bytes.len() <= LIMIT, "body too long");
 
     // Also known as ISO-8859-1 but that doesnt seem to be a defined standard.
     // https://docs.rs/encoding_rs/0.8.35/encoding_rs/index.html#iso-8859-1
