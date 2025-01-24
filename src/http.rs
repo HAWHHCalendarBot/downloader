@@ -2,8 +2,6 @@ use std::io::Read as _;
 use std::sync::LazyLock;
 
 use anyhow::Context as _;
-use encoding::all::ISO_8859_1;
-use encoding::{DecoderTrap, Encoding as _};
 use ureq::{Agent, Request};
 
 const USER_AGENT: &str = concat!(
@@ -35,11 +33,10 @@ pub fn get_haw_text(url: &str) -> anyhow::Result<String> {
         .into_reader()
         .read_to_end(&mut bytes)
         .with_context(|| format!("read bytes from body {url}"))?;
-    Ok(decode_haw_text(&bytes))
-}
 
-fn decode_haw_text(bytes: &[u8]) -> String {
-    ISO_8859_1
-        .decode(bytes, DecoderTrap::Replace)
-        .expect("Decoder Trap cant fail")
+    // Also known as ISO-8859-1 but that doesnt seem to be a defined standard.
+    // https://docs.rs/encoding_rs/0.8.35/encoding_rs/index.html#iso-8859-1
+    let haw_text = encoding_rs::mem::decode_latin1(&bytes).into_owned();
+
+    Ok(haw_text)
 }
