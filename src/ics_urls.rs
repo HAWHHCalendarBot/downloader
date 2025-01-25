@@ -30,9 +30,7 @@ pub fn get_all() -> Vec<Url> {
 fn get_from_url(base_url: &Url) -> anyhow::Result<Vec<Url>> {
     let body = get_text(base_url.as_str())?;
     let urls = get_from_body(base_url, &body)?;
-    if urls.is_empty() {
-        println!("WARNING: no ics urls from url {base_url}");
-    }
+    anyhow::ensure!(!urls.is_empty(), "no ics urls found");
     Ok(urls)
 }
 
