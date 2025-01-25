@@ -1,6 +1,3 @@
-use std::thread::sleep;
-use std::time::Duration;
-
 use crate::event_entry::EventEntry;
 
 mod additionals;
@@ -10,42 +7,15 @@ mod http;
 mod ics_to_json;
 mod ics_urls;
 
-const SLEEP_DURATION: Duration = Duration::from_secs(100 * 60); // 100 minutes
-#[allow(dead_code)]
-const WAIT_BETWEEEN_REQUESTS: Duration = Duration::from_millis(200); // 200 milliseconds
-
 fn main() {
     files::ensure_folders_exist().expect("create folders");
 
-    let mut error_count = 0;
-
-    loop {
-        println!("Its time for another download... Start!");
-        match the_loop() {
-            Ok(()) => {
-                error_count = 0;
-                println!("download successful");
-            }
-            Err(err) => {
-                println!("download failed... {err:#}");
-                error_count += 1;
-                assert!(error_count <= 3, "too many download errors");
-            }
-        }
-
-        println!("Wait till next download...\n\n");
-        sleep(SLEEP_DURATION);
-    }
-}
-
-fn the_loop() -> anyhow::Result<()> {
     let mut all_events = Vec::new();
 
     all_events.append(&mut part_ics());
-    all_events.append(&mut additionals::get()?);
+    all_events.append(&mut additionals::get().expect("Should get additionals"));
 
     files::save_events(all_events);
-    Ok(())
 }
 
 fn part_ics() -> Vec<EventEntry> {
@@ -87,8 +57,9 @@ fn part_ics() -> Vec<EventEntry> {
             }
         }
 
+        // Wait between requests
         #[cfg(not(debug_assertions))]
-        sleep(WAIT_BETWEEEN_REQUESTS);
+        std::thread::sleep(std::time::Duration::from_millis(200));
     }
     println!(
         "ICS downloaded {successful} urls with {} events",
