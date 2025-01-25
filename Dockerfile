@@ -28,7 +28,10 @@ RUN apt-get update \
 
 WORKDIR /app
 VOLUME /app/eventfiles
-VOLUME /app/additionalEventsGithub
+VOLUME /app/events
+
+COPY gitconfig /root/.gitconfig
+COPY known_hosts /root/.ssh/known_hosts
 
 COPY --from=builder /build/target/release/hawhh-calendarbot-downloader /usr/local/bin/
 ENTRYPOINT ["hawhh-calendarbot-downloader"]

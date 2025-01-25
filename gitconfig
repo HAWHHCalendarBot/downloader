@@ -1,0 +1,5 @@
+[pull]
+	ff = only
+[user]
+	name = downloader
+	email = calendarbot-downloader@hawhh.de

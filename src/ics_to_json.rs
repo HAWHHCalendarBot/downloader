@@ -21,8 +21,8 @@ pub fn parse(ics_body: &str) -> anyhow::Result<Vec<EventEntry>> {
             name: cap[1].trim().to_owned(),
             location: parse_location(cap[2].trim()),
             description: parse_description(dozent),
-            start_time: parse_datetime(cap[5].trim())?,
-            end_time: parse_datetime(cap[6].trim())?,
+            start: parse_datetime(cap[5].trim())?,
+            end: parse_datetime(cap[6].trim())?,
         });
     }
 

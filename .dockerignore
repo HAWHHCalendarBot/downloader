@@ -4,5 +4,5 @@
 Dockerfile
 rustfmt.toml
 
-/additionalEventsGithub
 /eventfiles
+/events

@@ -1,10 +1,20 @@
 use chrono::{NaiveDateTime, TimeZone as _};
 use chrono_tz::Europe::Berlin;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct EventEntry {
+    pub name: String,
+    pub location: String,
+    pub description: String,
+    pub start: NaiveDateTime,
+    pub end: NaiveDateTime,
+}
 
 #[derive(Serialize, Debug, PartialEq, Eq)]
 #[serde(rename_all = "PascalCase")]
-pub struct EventEntry {
+pub struct EventEntryV4 {
     pub name: String,
     pub location: String,
     pub description: String,
@@ -19,4 +29,16 @@ where
     S: serde::Serializer,
 {
     serializer.serialize_str(&Berlin.from_local_datetime(dt).unwrap().to_rfc3339())
+}
+
+impl From<EventEntry> for EventEntryV4 {
+    fn from(value: EventEntry) -> Self {
+        Self {
+            name: value.name,
+            location: value.location,
+            description: value.description,
+            start_time: value.start,
+            end_time: value.end,
+        }
+    }
 }

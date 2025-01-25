@@ -95,8 +95,8 @@ impl AdditionalEvent {
             name: self.name,
             location: self.room,
             description: DESCRIPTION.to_owned(),
-            start_time: start,
-            end_time: end,
+            start,
+            end,
         })
     }
 }
