@@ -1,8 +1,8 @@
-use std::io::Read as _;
 use std::sync::LazyLock;
 
-use anyhow::Context as _;
-use ureq::{Agent, Request};
+use ureq::http::header::FROM;
+use ureq::typestate::WithoutBody;
+use ureq::{Agent, RequestBuilder};
 
 const USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
@@ -12,32 +12,21 @@ const USER_AGENT: &str = concat!(
     env!("CARGO_PKG_REPOSITORY"),
 );
 
-fn get_with_headers(url: &str) -> Request {
-    static AGENT: LazyLock<Agent> =
-        LazyLock::new(|| ureq::AgentBuilder::new().user_agent(USER_AGENT).build());
-
+fn get_with_headers(url: &str) -> RequestBuilder<WithoutBody> {
+    static AGENT: LazyLock<Agent> = LazyLock::new(|| {
+        Agent::new_with_config(Agent::config_builder().user_agent(USER_AGENT).build())
+    });
     AGENT
         .get(url)
-        .set("from", "calendarbot-downloader@hawhh.de")
+        .header(FROM, "calendarbot-downloader@hawhh.de")
 }
 
-pub fn get_text(url: &str) -> anyhow::Result<String> {
-    let content = get_with_headers(url).call()?.into_string()?;
-    Ok(content)
+pub fn get_text(url: &str) -> Result<String, ureq::Error> {
+    get_with_headers(url).call()?.into_body().read_to_string()
 }
 
-pub fn get_haw_text(url: &str) -> anyhow::Result<String> {
-    const LIMIT: usize = 250_000;
-
-    let mut bytes: Vec<u8> = vec![];
-    get_with_headers(url)
-        .call()?
-        .into_reader()
-        .take((LIMIT + 1) as u64)
-        .read_to_end(&mut bytes)
-        .context("read bytes from body")?;
-
-    anyhow::ensure!(bytes.len() <= LIMIT, "body too long");
+pub fn get_haw_text(url: &str) -> Result<String, ureq::Error> {
+    let bytes = get_with_headers(url).call()?.into_body().read_to_vec()?;
 
     // Also known as ISO-8859-1 but that doesnt seem to be a defined standard.
     // https://docs.rs/encoding_rs/0.8.35/encoding_rs/index.html#iso-8859-1
