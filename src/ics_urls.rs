@@ -8,12 +8,23 @@ use crate::http::get_text;
 
 pub fn get_all() -> HashMap<&'static str, Vec<Url>> {
     let sources = [
-        ("informatik", "https://userdoc.informatik.haw-hamburg.de/doku.php?id=stundenplan:ics_public"),
-        ("information-engineering", "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/"),
-
+        (
+            "informatik",
+            "https://userdoc.informatik.haw-hamburg.de/doku.php?id=stundenplan:ics_public",
+        ),
+        (
+            "information-engineering",
+            "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/",
+        ),
         // nearly the same but not identical
-        ("elektrotechnik-und-informationstechnik", "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/"),
-        ("informations-und-elektrotechnik", "https://www.haw-hamburg.de/hochschule/technik-und-informatik/departments/informations-und-elektrotechnik/studium/studienorganisation/studienplaene/"),
+        (
+            "elektrotechnik-und-informationstechnik",
+            "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
+        ),
+        (
+            "informations-und-elektrotechnik",
+            "https://www.haw-hamburg.de/hochschule/technik-und-informatik/departments/informations-und-elektrotechnik/studium/studienorganisation/studienplaene/",
+        ),
     ];
 
     let mut result = HashMap::new();
