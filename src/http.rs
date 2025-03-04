@@ -1,10 +1,10 @@
-use std::sync::LazyLock;
-
-use ureq::http::header::FROM;
+use ureq::http::header::{FROM, USER_AGENT};
+use ureq::http::HeaderValue;
 use ureq::typestate::WithoutBody;
-use ureq::{Agent, RequestBuilder};
+use ureq::RequestBuilder;
 
-const USER_AGENT: &str = concat!(
+const FROM_VALUE: &str = "calendarbot-downloader@hawhh.de";
+const USER_AGENT_VALUE: &str = concat!(
     env!("CARGO_PKG_NAME"),
     "/",
     env!("CARGO_PKG_VERSION"),
@@ -13,12 +13,9 @@ const USER_AGENT: &str = concat!(
 );
 
 fn get_with_headers(url: &str) -> RequestBuilder<WithoutBody> {
-    static AGENT: LazyLock<Agent> = LazyLock::new(|| {
-        Agent::new_with_config(Agent::config_builder().user_agent(USER_AGENT).build())
-    });
-    AGENT
-        .get(url)
-        .header(FROM, "calendarbot-downloader@hawhh.de")
+    ureq::get(url)
+        .header(FROM, HeaderValue::from_static(FROM_VALUE))
+        .header(USER_AGENT, HeaderValue::from_static(USER_AGENT_VALUE))
 }
 
 pub fn get_text(url: &str) -> Result<String, ureq::Error> {
