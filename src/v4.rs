@@ -160,7 +160,7 @@ fn cleanup_superfluous_eventfiles(expected_files: &[String]) -> Vec<String> {
             continue;
         }
         let Some(name) = path.file_stem().and_then(std::ffi::OsStr::to_str) else {
-            eprintln!("WARNING: deleting non UTF8 named json file {path:?}");
+            eprintln!("WARNING: deleting non UTF8 named {}", path.display());
             fs::remove_file(&path).expect("should be able to remove superfluous event file");
             continue;
         };
