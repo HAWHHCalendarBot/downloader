@@ -31,7 +31,7 @@ fn download_ics() {
     let mut current: usize = 0;
     let mut successful: usize = 0;
 
-    #[allow(clippy::iter_over_hash_type)]
+    #[expect(clippy::iter_over_hash_type)]
     for (base, urls) in base_urls {
         let path = Path::new(events_git::FOLDER).join(base);
         drop(fs::remove_dir_all(&path)); // Allowed to be empty

@@ -1,7 +1,7 @@
-use ureq::http::header::{FROM, USER_AGENT};
-use ureq::http::HeaderValue;
-use ureq::typestate::WithoutBody;
 use ureq::RequestBuilder;
+use ureq::http::HeaderValue;
+use ureq::http::header::{FROM, USER_AGENT};
+use ureq::typestate::WithoutBody;
 
 const FROM_VALUE: &str = "calendarbot-downloader@hawhh.de";
 const USER_AGENT_VALUE: &str = concat!(

@@ -5,14 +5,17 @@ version = "4.0.3"
 license = "AGPL-3.0-or-later"
 repository = "https://github.com/HAWHHCalendarBot/downloader"
 authors = ["EdJoPaTo <calendarbot-downloader@edjopato.de>"]
-edition = "2021"
+edition = "2024"
 
 [lints.rust]
 unsafe_code = "forbid"
 unused_qualifications = "warn"
 [lints.clippy]
-pedantic = "warn"
-nursery = "warn"
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+allow_attributes = "warn"
+min_ident_chars = "warn"
+unused_trait_names = "warn"
 
 [profile.release]
 codegen-units = 1

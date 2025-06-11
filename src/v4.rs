@@ -6,7 +6,7 @@ use std::fs;
 use std::path::Path;
 
 use crate::event_entry::EventEntryV4;
-use crate::{events_git, EventEntry};
+use crate::{EventEntry, events_git};
 
 enum HasChanged {
     Changed,
@@ -69,7 +69,7 @@ fn save_events(all: Vec<EventEntry>) {
     let mut expected_files = Vec::with_capacity(grouped.len());
     let mut changed_events = Vec::new();
 
-    #[allow(clippy::iter_over_hash_type)]
+    #[expect(clippy::iter_over_hash_type)]
     for (key, events) in grouped {
         all_events.push(events.first().unwrap().name.clone());
         let has_changed = save_events_to_file(&key, events);
@@ -96,7 +96,7 @@ fn save_events(all: Vec<EventEntry>) {
     }
 }
 
-#[allow(clippy::min_ident_chars)]
+#[expect(clippy::min_ident_chars)]
 /// Groups the events by their file name
 fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
     fn ne<T: Ord>(a: &T, b: &T) -> Option<Ordering> {
@@ -112,7 +112,7 @@ fn get_grouped(all: Vec<EventEntry>) -> HashMap<String, Vec<EventEntry>> {
         grouped.entry(filename).or_default().push(entry);
     }
 
-    #[allow(clippy::iter_over_hash_type)]
+    #[expect(clippy::iter_over_hash_type)]
     for groupvalues in grouped.values_mut() {
         groupvalues.sort_by(|a, b| {
             ne(&a.start, &b.start)
