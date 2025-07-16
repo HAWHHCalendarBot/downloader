@@ -45,7 +45,7 @@ fn download_ics() {
             #[cfg(debug_assertions)]
             {
                 current += 1;
-                if current % 25 == 0 {
+                if current.is_multiple_of(25) {
                     println!("ICS file download {current:4}/{url_amount}");
                 }
             }
