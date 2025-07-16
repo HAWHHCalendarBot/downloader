@@ -14,12 +14,11 @@ pub fn get_all() -> HashMap<&'static str, Vec<Url>> {
         ),
         (
             "information-engineering",
-            "https://www.haw-hamburg.de/en/study/degree-courses-a-z/study-courses-in-detail/course/courses/show/information-engineering/Studierende/",
+            "https://www.haw-hamburg.de/en/bachelor-information-engineering-students/",
         ),
-        // nearly the same but not identical
         (
             "elektrotechnik-und-informationstechnik",
-            "https://www.haw-hamburg.de/studium/studiengaenge-a-z/studiengaenge-detail/course/courses/show/elektrotechnik-und-informationstechnik/Studierende/",
+            "https://www.haw-hamburg.de/bachelor-elektrotechnik-und-informationstechnik-studierende/",
         ),
         (
             "informations-und-elektrotechnik",
